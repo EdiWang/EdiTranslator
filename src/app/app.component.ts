@@ -110,7 +110,8 @@ export class AppComponent implements OnInit {
   }
 
   loadTranslations(): void {
-    this.translations = this.translationHistoryService.listAllTranslations();
+    this.translations = this.translationHistoryService.listAllTranslations()
+      .sort((a, b) => b.Id - a.Id); // Sort by Id in descending order
   }
 
   saveTranslation(sourceLanguage: LanguageChoice, targetLanguage: LanguageChoice, sourceText: string, translatedText: string) {
