@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/15bf06cf-caa3-4224-b7fb-cad42590472f/resourceGroups/translator-group/providers/Microsoft.Web/sites/edi-translator-web",
+    "appService.deploySubpath": "dist\\edi-translator\\browser"
+}

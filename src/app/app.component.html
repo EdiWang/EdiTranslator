@@ -7,6 +7,9 @@
 </header>
 
 <main class="container">
+  <div class="error-message mb-4" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
   <div class="row">
     <div class="col">
       <form class="form-source" [formGroup]="sourceForm" (ngSubmit)="onTranslate()">

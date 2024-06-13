@@ -19,6 +19,7 @@ export class AppComponent implements OnInit {
 
   isBusy: boolean = false;
   translatedText = '';
+  errorMessage = '';
 
   constructor(
     private formBuilder: FormBuilder,
@@ -40,14 +41,25 @@ export class AppComponent implements OnInit {
 
   onTranslate() {
     this.isBusy = true;
+    this.errorMessage = '';
+    
     this.azureTranslatorProxyService.translate({
       Content: this.sourceForm?.controls['sourceText']?.value,
       FromLang: this.sourceForm?.controls['sourceLanguage']?.value,
       ToLang: this.sourceForm?.controls['targetLanguage']?.value
-    }).subscribe((response: any) => {
-      this.translatedText = response[0].translations[0].text;
-      this.isBusy = false;
-    });
+    }).subscribe(
+      {
+        next: (response: any) => {
+          this.translatedText = response[0].translations[0].text;
+          this.isBusy = false;
+        },
+        error: (error) => {
+          console.error(error);
+          this.errorMessage = 'An error occurred while translating the text.';
+          this.isBusy = false;
+        }
+      }
+    );
   }
 
   swapLanguageSelector() {
