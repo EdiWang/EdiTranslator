@@ -73,7 +73,7 @@
 
       <div *ngIf="translations.length > 0; else noHistory">
         <ul class="translation-list">
-          <li *ngFor="let translation of translations" (click)="loadTranslation(translation)">
+          <li *ngFor="let translation of translations">
             <fluent-card class="translation-item mb-3">
               <div class="hs-date mb-2">{{ translation.Date | date:'short' }}</div>
 
@@ -85,11 +85,16 @@
               <div>
                 <strong>{{ translation.TargetLanguage.Name }}</strong>
               </div>
-              <div>{{ translation.TranslatedText }}</div>
+              <div class="mb-2">{{ translation.TranslatedText }}</div>
+
+              <fluent-button appearance="outline" class="me-2" (click)="loadTranslation(translation); $event.stopPropagation()">Load</fluent-button>
+
+              <fluent-button appearance="outline"
+                (click)="deleteTranslation(translation.Id); $event.stopPropagation()">Delete</fluent-button>
             </fluent-card>
           </li>
         </ul>
-        <fluent-button appearance="accent" (click)="clearTranslations()">Clear All History</fluent-button>
+        <fluent-button appearance="neutral" (click)="clearTranslations()">Clear All History</fluent-button>
       </div>
 
       <ng-template #noHistory>

@@ -133,6 +133,12 @@ export class AppComponent implements OnInit {
     console.log('All translations have been cleared.');
   }
 
+  deleteTranslation(id: number): void {
+    this.translationHistoryService.deleteTranslationById(id);
+    this.loadTranslations();
+    console.log(`Translation with ID ${id} has been deleted.`);
+  }
+
   // debug
   loadTranslation(translation: TranslationHistory): void {
     console.log(translation);

@@ -57,4 +57,10 @@ export class TranslationHistoryService {
     clearAllTranslations(): void {
         localStorage.removeItem(this.storageKey);
     }
+
+    deleteTranslationById(id: number): void {
+        let history = this.getHistory();
+        history = history.filter(h => h.Id !== id);
+        this.saveHistory(history);
+    }
 }
