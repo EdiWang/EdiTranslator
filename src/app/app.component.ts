@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LanguageChoice } from './models';
-import { AzureTranslatorProxyService } from './azure-translator-proxy.service';
+import { AzureTranslatorProxyService } from '../services/azure-translator-proxy.service';
+import { Clipboard } from '@angular/cdk/clipboard';
 
 @Component({
   selector: 'app-root',
@@ -12,14 +13,16 @@ export class AppComponent implements OnInit {
   sourceForm: FormGroup = new FormGroup({});
   languageList: LanguageChoice[] = [
     { Code: 'zh-Hans', Name: '简体中文 (Simplified Chinese)' },
-    { Code: 'en', Name: 'English' }
+    { Code: 'en', Name: 'English' },
+    { Code: 'ja', Name: '日本語 (Japanese)' }
   ];
   isBusy: boolean = false;
   translatedText = '';
 
   constructor(
     private formBuilder: FormBuilder,
-    private azureTranslatorProxyService: AzureTranslatorProxyService) {
+    private azureTranslatorProxyService: AzureTranslatorProxyService,
+    private clipboard: Clipboard) {
   }
 
   ngOnInit(): void {
@@ -35,10 +38,6 @@ export class AppComponent implements OnInit {
   }
 
   onTranslate() {
-    console.log(this.sourceForm?.controls['sourceText']?.value);
-    console.log(this.sourceForm?.controls['sourceLanguage']?.value);
-    console.log(this.sourceForm?.controls['targetLanguage']?.value);
-
     this.isBusy = true;
     this.azureTranslatorProxyService.translate({
       Content: this.sourceForm?.controls['sourceText']?.value,
@@ -57,6 +56,6 @@ export class AppComponent implements OnInit {
   }
 
   copyTranslatedText() {
-
+    this.clipboard.copy(this.translatedText);
   }
 }

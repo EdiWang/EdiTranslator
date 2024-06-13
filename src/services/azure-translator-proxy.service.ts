@@ -8,8 +8,10 @@ import { HttpClient } from '@angular/common/http';
 export class AzureTranslatorProxyService {
     constructor(private http: HttpClient) { }
 
+    apiEndpoint: string = 'https://edi-translator-api.azurewebsites.net';
+
     translate(request: TranslationRequest) {
-        let url = 'https://translator.ediwang.dev/api/Translation/translate';
+        let url = `${this.apiEndpoint}/api/translation/translate`;
         return this.http.post(url, request);
     }
 }
