@@ -73,7 +73,7 @@
 
       <div *ngIf="translations.length > 0; else noHistory">
         <ul class="translation-list">
-          <li *ngFor="let translation of translations" (click)="logTranslation(translation)">
+          <li *ngFor="let translation of translations" (click)="loadTranslation(translation)">
             <fluent-card class="translation-item mb-3">
               <div class="hs-date mb-2">{{ translation.Date | date:'short' }}</div>
 

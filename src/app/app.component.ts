@@ -80,7 +80,7 @@ export class AppComponent implements OnInit {
             this.sourceForm.controls['sourceText'].value,
             this.translatedText
           );
-          
+
           this.loadTranslations();
         },
         error: (error) => {
@@ -134,7 +134,12 @@ export class AppComponent implements OnInit {
   }
 
   // debug
-  logTranslation(translation: TranslationHistory): void {
+  loadTranslation(translation: TranslationHistory): void {
     console.log(translation);
+
+    this.sourceForm.controls['sourceLanguage'].setValue(translation.SourceLanguage.Code);
+    this.sourceForm.controls['targetLanguage'].setValue(translation.TargetLanguage.Code);
+    this.sourceForm.controls['sourceText'].setValue(translation.SourceText);
+    this.translatedText = translation.TranslatedText;
   }
 }
