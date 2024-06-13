@@ -64,3 +64,12 @@ fluent-text-area {
     color: rgb(88, 21, 28);
     font-size: 14px;
 }
+
+footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #666;
+    font-size: 14px;
+    margin-top: 70px;
+}
