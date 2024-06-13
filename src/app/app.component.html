@@ -69,19 +69,24 @@
       </div>
     </div>
     <div class="col-lg-3">
-      <h3>Translation History</h3>
+      <h3>History</h3>
 
       <div *ngIf="translations.length > 0; else noHistory">
         <ul class="translation-list">
           <li *ngFor="let translation of translations" (click)="logTranslation(translation)">
-            <div class="translation-item">
-              <p><strong>ID:</strong> {{ translation.Id }}</p>
-              <p><strong>Date:</strong> {{ translation.Date | date:'short' }}</p>
-              <p><strong>Source Language:</strong> {{ translation.SourceLanguage.Name }}</p>
-              <p><strong>Target Language:</strong> {{ translation.TargetLanguage.Name }}</p>
-              <p><strong>Source Text:</strong> {{ translation.SourceText }}</p>
-              <p><strong>Translated Text:</strong> {{ translation.TranslatedText }}</p>
-            </div>
+            <fluent-card class="translation-item mb-3">
+              <div class="hs-date mb-2">{{ translation.Date | date:'short' }}</div>
+
+              <div>
+                <strong>{{ translation.SourceLanguage.Name }}</strong>
+              </div>
+              <div class="mb-2">{{ translation.SourceText }}</div>
+
+              <div>
+                <strong>{{ translation.TargetLanguage.Name }}</strong>
+              </div>
+              <div>{{ translation.TranslatedText }}</div>
+            </fluent-card>
           </li>
         </ul>
         <fluent-button appearance="accent" (click)="clearTranslations()">Clear All History</fluent-button>
