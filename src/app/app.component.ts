@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LanguageChoice } from './models';
 import { AzureTranslatorProxyService } from '../services/azure-translator-proxy.service';
 import { Clipboard } from '@angular/cdk/clipboard';
+import { TranslationHistoryService } from '../services/translation-history.service';
 
 @Component({
   selector: 'app-root',
@@ -41,7 +42,8 @@ export class AppComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private azureTranslatorProxyService: AzureTranslatorProxyService,
-    private clipboard: Clipboard) {
+    private clipboard: Clipboard,
+    private translationHistoryService: TranslationHistoryService) {
   }
 
   ngOnInit(): void {
@@ -69,6 +71,16 @@ export class AppComponent implements OnInit {
         next: (response: any) => {
           this.translatedText = response[0].translations[0].text;
           this.isBusy = false;
+
+          this.saveTranslation(
+            this.languageList.find(l => l.Code === this.sourceForm.controls['sourceLanguage'].value)!,
+            this.languageList.find(l => l.Code === this.sourceForm.controls['targetLanguage'].value)!,
+            this.sourceForm.controls['sourceText'].value,
+            this.translatedText
+          );
+
+          // debug
+          this.listAllTranslations();
         },
         error: (error) => {
           console.error(error);
@@ -94,5 +106,24 @@ export class AppComponent implements OnInit {
 
   copyTranslatedText() {
     this.clipboard.copy(this.translatedText);
+  }
+
+  saveTranslation(sourceLanguage: LanguageChoice, targetLanguage: LanguageChoice, sourceText: string, translatedText: string) {
+    this.translationHistoryService.saveTranslation(sourceLanguage, targetLanguage, sourceText, translatedText);
+  }
+
+  getTranslation(id: number) {
+    const translation = this.translationHistoryService.getTranslationById(id);
+    console.log(translation);
+  }
+
+  listAllTranslations() {
+    const allTranslations = this.translationHistoryService.listAllTranslations();
+    console.log(allTranslations);
+  }
+
+  clearTranslations() {
+    this.translationHistoryService.clearAllTranslations();
+    console.log('All translations have been cleared.');
   }
 }
