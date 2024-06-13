@@ -13,8 +13,24 @@ export class AppComponent implements OnInit {
   sourceForm: FormGroup = new FormGroup({});
   languageList: LanguageChoice[] = [
     { Code: 'zh-Hans', Name: '简体中文 (Simplified Chinese)' },
-    { Code: 'en', Name: 'English' },
-    { Code: 'ja', Name: '日本語 (Japanese)' }
+    { Code: 'zh-Hant', Name: '繁體中文 (Traditional Chinese)' },
+    { Code: 'en-US', Name: 'English (United States)' },
+    { Code: 'ar', Name: 'العربية (Arabic)' },
+    { Code: 'de', Name: 'Deutsch (German)' },
+    { Code: 'es', Name: 'Español (Spanish)' },
+    { Code: 'fr', Name: 'Français (French)' },
+    { Code: 'hi', Name: 'हिन्दी (Hindi)' },
+    { Code: 'id', Name: 'Bahasa Indonesia (Indonesian)' },
+    { Code: 'it', Name: 'Italiano (Italian)' },
+    { Code: 'ja', Name: '日本語 (Japanese)' },
+    { Code: 'ko', Name: '한국어 (Korean)' },
+    { Code: 'nl', Name: 'Nederlands (Dutch)' },
+    { Code: 'pl', Name: 'Polski (Polish)' },
+    { Code: 'pt', Name: 'Português (Portuguese)' },
+    { Code: 'ru', Name: 'Русский (Russian)' },
+    { Code: 'th', Name: 'ไทย (Thai)' },
+    { Code: 'tr', Name: 'Türkçe (Turkish)' },
+    { Code: 'vi', Name: 'Tiếng Việt (Vietnamese)' }
   ];
 
   isBusy: boolean = false;
@@ -35,14 +51,14 @@ export class AppComponent implements OnInit {
     this.sourceForm = this.formBuilder.group({
       sourceText: ['', [Validators.required]],
       sourceLanguage: [this.languageList[0].Code, [Validators.required]],
-      targetLanguage: [this.languageList[1].Code, [Validators.required]]
+      targetLanguage: [this.languageList[2].Code, [Validators.required]]
     })
   }
 
   onTranslate() {
     this.isBusy = true;
     this.errorMessage = '';
-    
+
     this.azureTranslatorProxyService.translate({
       Content: this.sourceForm?.controls['sourceText']?.value,
       FromLang: this.sourceForm?.controls['sourceLanguage']?.value,
