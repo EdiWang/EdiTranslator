@@ -8,6 +8,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AuthInterceptor } from '../interceptors/auth.interceptor';
+import { RetryInterceptor } from '../interceptors/retry-http-errors.interceptor';
 
 @NgModule({
   declarations: [
@@ -23,6 +24,7 @@ import { AuthInterceptor } from '../interceptors/auth.interceptor';
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: RetryInterceptor, multi: true },
     provideHttpClient(withInterceptorsFromDi())
   ],
   bootstrap: [AppComponent]
