@@ -33,6 +33,7 @@ export class AppComponent implements OnInit {
     { Code: 'vi', Name: 'Tiếng Việt (Vietnamese)' }
   ];
 
+  maxTextLength: number = 5000;
   isBusy: boolean = false;
   translatedText = '';
   errorMessage = '';

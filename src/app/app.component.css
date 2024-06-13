@@ -31,8 +31,20 @@ section.translator-text-container {
     flex-wrap: wrap;
 }
 
+.source-text {
+    font-size: 16px;
+    line-height: 25px;
+}
+
 .translated-text-container {
     margin-top: 41px;
+    background-color: #F2F2F2;
+    min-height: 264px;
+    max-height: calc(100vh - 200px);
+    border-radius: 4px;
+    padding: 8px;
+    font-size: 16px;
+    line-height: 25px;
 }
 
 .char-count {
