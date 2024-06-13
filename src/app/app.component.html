@@ -11,7 +11,7 @@
     {{ errorMessage }}
   </div>
   <div class="row">
-    <div class="col">
+    <div class="col-sm-12 col-md-6">
       <form class="form-source" [formGroup]="sourceForm" (ngSubmit)="onTranslate()">
         <section class="translator-text-container">
           <!--Toolbar-->
@@ -42,7 +42,7 @@
         </div>
       </form>
     </div>
-    <div class="col">
+    <div class="col-sm-12 col-md-6">
       <section class="translator-text-container">
         <!-- <div>
           <fluent-select title="Font size" ngDefaultControl>
