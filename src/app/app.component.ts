@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LanguageChoice } from './models';
 import { AzureTranslatorProxyService } from '../services/azure-translator-proxy.service';
 import { Clipboard } from '@angular/cdk/clipboard';
-import { TranslationHistoryService } from '../services/translation-history.service';
+import { TranslationHistory, TranslationHistoryService } from '../services/translation-history.service';
 
 @Component({
   selector: 'app-root',
@@ -38,6 +38,7 @@ export class AppComponent implements OnInit {
   isBusy: boolean = false;
   translatedText = '';
   errorMessage = '';
+  translations: TranslationHistory[] = [];
 
   constructor(
     private formBuilder: FormBuilder,
@@ -48,6 +49,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.buildForm();
+    this.loadTranslations();
   }
 
   buildForm() {
@@ -78,9 +80,8 @@ export class AppComponent implements OnInit {
             this.sourceForm.controls['sourceText'].value,
             this.translatedText
           );
-
-          // debug
-          this.listAllTranslations();
+          
+          this.loadTranslations();
         },
         error: (error) => {
           console.error(error);
@@ -108,6 +109,10 @@ export class AppComponent implements OnInit {
     this.clipboard.copy(this.translatedText);
   }
 
+  loadTranslations(): void {
+    this.translations = this.translationHistoryService.listAllTranslations();
+  }
+
   saveTranslation(sourceLanguage: LanguageChoice, targetLanguage: LanguageChoice, sourceText: string, translatedText: string) {
     this.translationHistoryService.saveTranslation(sourceLanguage, targetLanguage, sourceText, translatedText);
   }
@@ -124,6 +129,12 @@ export class AppComponent implements OnInit {
 
   clearTranslations() {
     this.translationHistoryService.clearAllTranslations();
+    this.loadTranslations();
     console.log('All translations have been cleared.');
+  }
+
+  // debug
+  logTranslation(translation: TranslationHistory): void {
+    console.log(translation);
   }
 }

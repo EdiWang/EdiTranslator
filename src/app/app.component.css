@@ -65,6 +65,24 @@ fluent-text-area {
     font-size: 14px;
 }
 
+.translation-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.translation-item {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.translation-item:hover {
+    background-color: #f9f9f9;
+}
+
+
 footer {
     display: flex;
     justify-content: center;
