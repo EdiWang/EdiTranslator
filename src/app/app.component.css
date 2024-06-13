@@ -28,6 +28,7 @@ section.translator-text-container {
 
 .lang-selector-bar {
     gap: 5px;
+    flex-wrap: wrap;
 }
 
 .translated-text-container {
