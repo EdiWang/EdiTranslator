@@ -1,0 +1,7 @@
+{
+    "/api": {
+        "target": "https://edi-translator-api.azurewebsites.net/",
+        "secure": false,
+        "changeOrigin": true
+    }
+}
