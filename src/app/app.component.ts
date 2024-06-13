@@ -16,6 +16,7 @@ export class AppComponent implements OnInit {
     { Code: 'en', Name: 'English' },
     { Code: 'ja', Name: '日本語 (Japanese)' }
   ];
+
   isBusy: boolean = false;
   translatedText = '';
 
@@ -47,6 +48,13 @@ export class AppComponent implements OnInit {
       this.translatedText = response[0].translations[0].text;
       this.isBusy = false;
     });
+  }
+
+  swapLanguageSelector() {
+    const sourceLanguage = this.sourceForm.controls['sourceLanguage'].value;
+    const targetLanguage = this.sourceForm.controls['targetLanguage'].value;
+    this.sourceForm.controls['sourceLanguage'].setValue(targetLanguage);
+    this.sourceForm.controls['targetLanguage'].setValue(sourceLanguage);
   }
 
   clear() {

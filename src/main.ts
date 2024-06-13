@@ -9,7 +9,8 @@ import {
   fluentTextField,
   fluentTextArea,
   fluentSelect,
-  fluentOption
+  fluentOption,
+  fluentProgress
 } from '@fluentui/web-components';
 
 provideFluentDesignSystem().register(
@@ -18,7 +19,8 @@ provideFluentDesignSystem().register(
   fluentTextField(),
   fluentTextArea(),
   fluentSelect(),
-  fluentOption()
+  fluentOption(),
+  fluentProgress()
 );
 
 platformBrowserDynamic().bootstrapModule(AppModule, {

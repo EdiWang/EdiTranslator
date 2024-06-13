@@ -1,19 +1,33 @@
 header {
-    display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 10px 20px;
+    height: 60px;
+}
+
+header nav {
+    display: flex;
+    padding: 12px 20px;
+    justify-content: space-between;
     border-bottom: 1px solid #ccc;
 }
 
+header nav small {
+    align-self: center;
+}
+
 header h1 {
+    align-self: center;
     font-size: 24px;
+    margin: 0 !important;
 }
 
 section.translator-text-container {
     display: flex;
     flex-direction: column;
     gap: 10px;
+}
+
+.lang-selector-bar {
+    gap: 5px;
 }
 
 .translated-text-container {
