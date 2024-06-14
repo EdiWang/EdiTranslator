@@ -12,4 +12,17 @@
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
     </ItemGroup>
 
+    <Target Name="EnsureNodeVersion" BeforeTargets="Build">
+        <Exec Command="node -v" ContinueOnError="true">
+            <Output TaskParameter="ExitCode" PropertyName="NodeExitCode" />
+        </Exec>
+        <Error Condition="'$(NodeExitCode)' != '0'" Text="Node.js is not installed. Please install Node.js version 20 or higher." />
+        <Message Importance="high" Text="Restoring dependencies using 'npm'..." />
+        <Exec Command="npm install" WorkingDirectory="web" />
+    </Target>
+
+    <Target Name="BuildAngular" AfterTargets="Build">
+        <Message Importance="high" Text="Building Angular project..." />
+        <Exec Command="ng build" WorkingDirectory="web" />
+    </Target>
 </Project>
