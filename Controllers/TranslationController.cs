@@ -1,6 +1,7 @@
 ﻿using Azure;
 using Azure.AI.Translation.Text;
 using Edi.Translator.Models;
+using Edi.Translator.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Text;
@@ -13,7 +14,7 @@ namespace Edi.Translator.Controllers;
 public class TranslationController(
     IConfiguration configuration,
     ILogger<TranslationController> logger,
-    HttpClient httpClient)
+    IAOAIClient aoaiClient)
     : ControllerBase
 {
     [HttpPost("translate")]
@@ -54,40 +55,9 @@ public class TranslationController(
     [EnableRateLimiting("TranslateLimiter")]
     public async Task<IActionResult> TranslateByOpenAI([FromBody] TranslationRequest request)
     {
-        // TODO: Refact to typed http client
         try
         {
-            var endpoint = configuration["AzureOpenAI:Endpoint"];
-            var apiKey = configuration["AzureOpenAI:Key"];
-            var deploymentName = configuration["AzureOpenAI:DeploymentName"];
-
-            httpClient.DefaultRequestHeaders.Add("api-key", $"{apiKey}");
-
-            var requestBody = new AOAIRequest
-            {
-                Messages =
-                [
-                    new()
-                    {
-                        Role = "system",
-                        Content = "You are a professional translator. I will give you language code like 'zh-CN', 'en-US', and a content. You will help me translate text from one language to another language."
-                    },
-
-                    new()
-                    {
-                        Role = "user",
-                        Content = $"Translate the following text from {request.FromLang} to {request.ToLang}: {request.Content}"
-                    }
-                ]
-            };
-
-            var content = new StringContent(JsonSerializer.Serialize(requestBody, AOAISerializeOption.Default), Encoding.UTF8, "application/json");
-
-            HttpResponseMessage response = await httpClient.PostAsync($"{endpoint}/openai/deployments/{deploymentName}/chat/completions?api-version=2024-02-15-preview", content);
-            response.EnsureSuccessStatusCode();
-
-            string responseBody = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<AOAIResponse>(responseBody, AOAISerializeOption.Default);
+            var result = await aoaiClient.TranslateAsync(request.FromLang, request.ToLang, request.Content);
 
             return Ok(result.Choices[0]?.Message);
         }
