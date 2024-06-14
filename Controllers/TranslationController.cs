@@ -54,11 +54,12 @@ public class TranslationController(
     [EnableRateLimiting("TranslateLimiter")]
     public async Task<IActionResult> TranslateByOpenAI([FromBody] TranslationRequest request)
     {
-        // TODO: Refact to typed http client, extract model name to configuration
+        // TODO: Refact to typed http client
         try
         {
             var endpoint = configuration["AzureOpenAI:Endpoint"];
             var apiKey = configuration["AzureOpenAI:Key"];
+            var deploymentName = configuration["AzureOpenAI:DeploymentName"];
 
             httpClient.DefaultRequestHeaders.Add("api-key", $"{apiKey}");
 
@@ -82,7 +83,7 @@ public class TranslationController(
 
             var content = new StringContent(JsonSerializer.Serialize(requestBody, AOAISerializeOption.Default), Encoding.UTF8, "application/json");
 
-            HttpResponseMessage response = await httpClient.PostAsync($"{endpoint}/openai/deployments/gpt-4o/chat/completions?api-version=2024-02-15-preview", content);
+            HttpResponseMessage response = await httpClient.PostAsync($"{endpoint}/openai/deployments/{deploymentName}/chat/completions?api-version=2024-02-15-preview", content);
             response.EnsureSuccessStatusCode();
 
             string responseBody = await response.Content.ReadAsStringAsync();
