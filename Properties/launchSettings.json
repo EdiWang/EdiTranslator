@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "http": {
+    "dev-buildweb": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "",
@@ -8,17 +8,17 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "dotnetRunMessages": true,
-      "applicationUrl": "http://localhost:5058"
+      "applicationUrl": "https://localhost:7103"
     },
-    "https": {
+    "dev-swagger": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "",
+      "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "dotnetRunMessages": true,
-      "applicationUrl": "https://localhost:7103;http://localhost:5058"
+      "applicationUrl": "https://localhost:7103"
     }
   },
   "$schema": "http://json.schemastore.org/launchsettings.json"
