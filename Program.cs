@@ -1,5 +1,5 @@
 using Edi.Translator.Configuration;
-using Edi.Translator.Services;
+using Edi.Translator.Providers.AzureOpenAI;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
 

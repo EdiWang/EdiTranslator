@@ -2,7 +2,7 @@
 using System.Text.Json;
 using System.Text.Unicode;
 
-namespace Edi.Translator.Models;
+namespace Edi.Translator.Providers.AzureOpenAI;
 
 public static class AOAISerializeOption
 {

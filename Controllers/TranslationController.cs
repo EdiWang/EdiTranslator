@@ -1,7 +1,7 @@
 ﻿using Azure;
 using Azure.AI.Translation.Text;
 using Edi.Translator.Models;
-using Edi.Translator.Services;
+using Edi.Translator.Providers.AzureOpenAI;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 
@@ -40,7 +40,13 @@ public class TranslationController(
             var translations = response.Value;
             var translation = translations.FirstOrDefault();
 
-            return Ok(translation);
+            var result = new TranslationResult
+            {
+                ProviderCode = "azure-translator",
+                TranslatedText = translation?.Translations[0].Text
+            };
+
+            return Ok(result);
         }
         catch (Exception ex)
         {
@@ -55,9 +61,15 @@ public class TranslationController(
     {
         try
         {
-            var result = await aoaiClient.TranslateAsync(request.FromLang, request.ToLang, request.Content);
+            var aoiResult = await aoaiClient.TranslateAsync(request.FromLang, request.ToLang, request.Content);
 
-            return Ok(result.Choices[0]?.Message);
+            var result = new TranslationResult
+            {
+                ProviderCode = "aoai",
+                TranslatedText = aoiResult.Choices[0]?.Message.Content
+            };
+
+            return Ok(result);
         }
         catch (Exception ex)
         {

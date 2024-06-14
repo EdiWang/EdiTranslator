@@ -13,15 +13,3 @@ public class TranslationRequest
     [Required]
     public string ToLang { get; set; }
 }
-
-public class AOAIMessage
-{
-    public string Role { get; set; }
-
-    public string Content { get; set; }
-}
-
-public class AOAIRequest
-{
-    public List<AOAIMessage> Messages { get; set; }
-}

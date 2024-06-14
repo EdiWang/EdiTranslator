@@ -2,7 +2,7 @@
 using System.Text;
 using System.Text.Json;
 
-namespace Edi.Translator.Services;
+namespace Edi.Translator.Providers.AzureOpenAI;
 
 public interface IAOAIClient
 {
@@ -58,4 +58,32 @@ public class AOAIClient : IAOAIClient
 
         return result;
     }
+}
+
+public class AOAIMessage
+{
+    public string Role { get; set; }
+
+    public string Content { get; set; }
+}
+
+public class AOAIRequest
+{
+    public List<AOAIMessage> Messages { get; set; }
+}
+
+public class AOAIResponse
+{
+    public Choice[] Choices { get; set; }
+}
+
+public class Choice
+{
+    public Message Message { get; set; }
+}
+
+public class Message
+{
+    public string Content { get; set; }
+    public string Role { get; set; }
 }
