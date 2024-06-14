@@ -21,6 +21,13 @@ public class Program
         builder.Services.AddSwaggerGen();
         builder.Services.AddApplicationInsightsTelemetry();
 
+        builder.Services.Configure<RouteOptions>(options =>
+        {
+            options.LowercaseUrls = true;
+            options.LowercaseQueryStrings = true;
+            options.AppendTrailingSlash = false;
+        });
+
         builder.Services.AddRateLimiter(limiterOptions =>
         {
             limiterOptions.OnRejected = async (context, ct) =>
