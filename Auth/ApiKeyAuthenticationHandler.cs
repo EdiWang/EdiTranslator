@@ -4,7 +4,7 @@ using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 
-namespace Edi.AzureTranslatorProxy.Auth;
+namespace Edi.Translator.Auth;
 
 // Credits: https://josefottosson.se/asp-net-core-protect-your-api-with-api-keys/
 public class ApiKeyAuthenticationHandler(IOptionsMonitor<ApiKeyAuthenticationOptions> options,

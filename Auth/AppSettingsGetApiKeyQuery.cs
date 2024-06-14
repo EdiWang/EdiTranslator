@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 
-namespace Edi.AzureTranslatorProxy.Auth;
+namespace Edi.Translator.Auth;
 
 public class AppSettingsGetApiKeyQuery : IGetApiKeyQuery
 {

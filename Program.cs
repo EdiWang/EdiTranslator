@@ -1,9 +1,9 @@
-using Edi.AzureTranslatorProxy.Auth;
-using Edi.AzureTranslatorProxy.Configuration;
+using Edi.Translator.Auth;
+using Edi.Translator.Configuration;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
 
-namespace Edi.AzureTranslatorProxy;
+namespace Edi.Translator;
 
 public class Program
 {

@@ -1,4 +1,4 @@
-﻿namespace Edi.AzureTranslatorProxy.Auth;
+﻿namespace Edi.Translator.Auth;
 
 public class ApiKey
 {

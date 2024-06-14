@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 
-namespace Edi.AzureTranslatorProxy.Auth;
+namespace Edi.Translator.Auth;
 
 public class ApiKeyAuthenticationOptions : AuthenticationSchemeOptions
 {

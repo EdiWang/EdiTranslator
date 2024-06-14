@@ -1,11 +1,11 @@
-﻿using Edi.AzureTranslatorProxy.Models;
+﻿using Edi.Translator.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Text;
 using System.Text.Json;
 
-namespace Edi.AzureTranslatorProxy.Controllers;
+namespace Edi.Translator.Controllers;
 
 [Authorize]
 [ApiController]
