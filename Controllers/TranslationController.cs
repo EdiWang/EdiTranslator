@@ -23,6 +23,15 @@ public class TranslationController(
             var apiKey = configuration["AzureTranslator:Key"];
             var region = configuration["AzureTranslator:Region"];
 
+            // check if endpoint, apiKey and region are set
+            if (string.IsNullOrEmpty(endpoint) || string.IsNullOrEmpty(apiKey) || string.IsNullOrEmpty(region))
+            {
+                var message = "Translator configuration is missing.";
+
+                logger.LogError(message);
+                return StatusCode(500, message);
+            }
+
             var client = new TextTranslationClient(new AzureKeyCredential(apiKey), new(endpoint), region);
             var response = await client.TranslateAsync(request.ToLang, request.Content, request.FromLang);
 
