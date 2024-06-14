@@ -80,7 +80,7 @@ export class AppComponent implements OnInit {
     ).subscribe(
       {
         next: (response: any) => {
-          this.translatedText = response.translations[0]?.text;
+          this.translatedText = response.translatedText;
           this.isBusy = false;
 
           this.saveTranslation(
@@ -133,15 +133,9 @@ export class AppComponent implements OnInit {
     console.log(translation);
   }
 
-  listAllTranslations() {
-    const allTranslations = this.translationHistoryService.listAllTranslations();
-    console.log(allTranslations);
-  }
-
   clearTranslations() {
     this.translationHistoryService.clearAllTranslations();
     this.loadTranslations();
-    console.log('All translations have been cleared.');
   }
 
   deleteTranslation(id: number): void {
@@ -157,6 +151,7 @@ export class AppComponent implements OnInit {
     this.sourceForm.controls['targetLanguage'].setValue(translation.TargetLanguage.Code);
     this.sourceForm.controls['sourceText'].setValue(translation.SourceText);
     this.sourceForm.controls['provider'].setValue(translation.Provider);
+    
     this.translatedText = translation.TranslatedText;
   }
 }

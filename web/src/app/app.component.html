@@ -75,7 +75,7 @@
         <ul class="translation-list">
           <li *ngFor="let translation of translations">
             <fluent-card class="translation-item mb-3">
-              <div class="hs-date mb-2">{{ translation.Date | date:'short' }}, {{ translation.Provider?.Name }}</div>
+              <div class="hs-date mb-2">{{ translation.Date | date:'short' }}, {{ translation.Provider.Name }}</div>
 
               <div>
                 <strong>{{ translation.SourceLanguage.Name }}</strong>
