@@ -15,7 +15,7 @@ public class TranslationController(
     IAOAIClient aoaiClient)
     : ControllerBase
 {
-    [HttpPost("translate")]
+    [HttpPost("azure-translator")]
     [EnableRateLimiting("TranslateLimiter")]
     public async Task<IActionResult> Translate([FromBody] TranslationRequest request)
     {
@@ -49,7 +49,7 @@ public class TranslationController(
         }
     }
 
-    [HttpPost("translate/oai")]
+    [HttpPost("aoai")]
     [EnableRateLimiting("TranslateLimiter")]
     public async Task<IActionResult> TranslateByOpenAI([FromBody] TranslationRequest request)
     {

@@ -8,7 +8,7 @@ export interface TranslationHistory {
     SourceText: string;
     TranslatedText: string;
     Date: Date;
-    Provider?: ApiProvider;
+    Provider: ApiProvider;
 }
 
 @Injectable({

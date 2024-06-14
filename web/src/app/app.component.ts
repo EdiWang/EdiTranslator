@@ -36,7 +36,7 @@ export class AppComponent implements OnInit {
 
   providerList: ApiProvider[] = [
     { Code: 'azure-translator', Name: 'Azure Translator (Text)' },
-    { Code: 'aoai-gpt4o', Name: 'Azure Open AI (GPT-4o)' }
+    { Code: 'aoai', Name: 'Azure Open AI (GPT-4o)' }
   ]
 
   maxTextLength: number = 5000;
