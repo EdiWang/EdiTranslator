@@ -2,7 +2,7 @@
 
 A simple Web UI that uses the Azure AI Translator API to translate text from one language to another. 
 
-> Please note the Azure AI Translator is NOT LLM. If you are looking for LLM (e.g. GPT, llama), this is not for you yet.
+> Please note the Azure AI Translator is NOT LLM. Open AI support is on the way.
 
 ![image](https://github.com/EdiWang/EdiTranslator/assets/3304703/8b3de68c-f6aa-46c2-8ca9-a534d878d111)
 
