@@ -8,8 +8,8 @@ import { HttpClient } from '@angular/common/http';
 export class AzureTranslatorProxyService {
     constructor(private http: HttpClient) { }
 
-    translate(request: TranslationRequest) {
-        let url = `/api/translation/translate`;
+    translate(request: TranslationRequest, provider: string) {
+        let url = `/api/translation/${provider}`;
         return this.http.post(url, request);
     }
 }
@@ -19,12 +19,3 @@ export interface TranslationRequest {
     FromLang: string;
     ToLang: string;
 }
-
-// export interface TranslationResponse {
-//     Translations: TranslationResult[];
-// }
-
-// export interface TranslationResult {
-//     Text: string;
-//     To: string;
-// }

@@ -1,4 +1,5 @@
 using Edi.Translator.Configuration;
+using Edi.Translator.Providers.AzureOpenAI;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
 
@@ -20,6 +21,7 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
         builder.Services.AddApplicationInsightsTelemetry();
+        builder.Services.AddHttpClient<IAOAIClient, AOAIClient>();
 
         builder.Services.Configure<RouteOptions>(options =>
         {
