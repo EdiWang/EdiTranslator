@@ -1,6 +1,7 @@
-﻿using Azure.AI.Translation.Text;
-using Azure;
+﻿using Azure;
+using Azure.AI.Translation.Text;
 using Edi.Translator.Models;
+using Edi.Translator.Providers.AzureOpenAI;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 
@@ -10,10 +11,11 @@ namespace Edi.Translator.Controllers;
 [Route("api/[controller]")]
 public class TranslationController(
     IConfiguration configuration,
-    ILogger<TranslationController> logger)
+    ILogger<TranslationController> logger,
+    IAOAIClient aoaiClient)
     : ControllerBase
 {
-    [HttpPost("translate")]
+    [HttpPost("azure-translator")]
     [EnableRateLimiting("TranslateLimiter")]
     public async Task<IActionResult> Translate([FromBody] TranslationRequest request)
     {
@@ -38,7 +40,36 @@ public class TranslationController(
             var translations = response.Value;
             var translation = translations.FirstOrDefault();
 
-            return Ok(translation);
+            var result = new TranslationResult
+            {
+                ProviderCode = "azure-translator",
+                TranslatedText = translation?.Translations[0].Text
+            };
+
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error occurred while translating text.");
+            return StatusCode(500, ex.Message);
+        }
+    }
+
+    [HttpPost("aoai")]
+    [EnableRateLimiting("TranslateLimiter")]
+    public async Task<IActionResult> TranslateByOpenAI([FromBody] TranslationRequest request)
+    {
+        try
+        {
+            var aoiResult = await aoaiClient.TranslateAsync(request.FromLang, request.ToLang, request.Content);
+
+            var result = new TranslationResult
+            {
+                ProviderCode = "aoai",
+                TranslatedText = aoiResult.Choices[0]?.Message.Content
+            };
+
+            return Ok(result);
         }
         catch (Exception ex)
         {

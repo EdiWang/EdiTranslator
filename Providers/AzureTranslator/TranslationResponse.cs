@@ -1,4 +1,4 @@
-﻿namespace Edi.Translator.Models;
+﻿namespace Edi.Translator.Providers.AzureTranslator;
 
 public class TranslationResponse
 {
