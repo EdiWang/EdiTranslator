@@ -13,16 +13,16 @@ public class Translation
 
 public class AOAIResponse
 {
-    public Choice[] choices { get; set; }
+    public Choice[] Choices { get; set; }
 }
 
 public class Choice
 {
-    public Message message { get; set; }
+    public Message Message { get; set; }
 }
 
 public class Message
 {
-    public string content { get; set; }
-    public string role { get; set; }
+    public string Content { get; set; }
+    public string Role { get; set; }
 }

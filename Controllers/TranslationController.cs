@@ -1,9 +1,8 @@
-﻿using Azure.AI.Translation.Text;
-using Azure;
+﻿using Azure;
+using Azure.AI.Translation.Text;
 using Edi.Translator.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using static System.Net.Mime.MediaTypeNames;
 using System.Text;
 using System.Text.Json;
 
@@ -81,15 +80,15 @@ public class TranslationController(
                 ]
             };
 
-            var content = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonSerializer.Serialize(requestBody, AOAISerializeOption.Default), Encoding.UTF8, "application/json");
 
             HttpResponseMessage response = await httpClient.PostAsync($"{endpoint}/openai/deployments/gpt-4o/chat/completions?api-version=2024-02-15-preview", content);
             response.EnsureSuccessStatusCode();
 
             string responseBody = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<AOAIResponse>(responseBody);
+            var result = JsonSerializer.Deserialize<AOAIResponse>(responseBody, AOAISerializeOption.Default);
 
-            return Ok(result.choices[0]?.message);
+            return Ok(result.Choices[0]?.Message);
         }
         catch (Exception ex)
         {

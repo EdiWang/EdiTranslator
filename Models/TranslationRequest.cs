@@ -17,15 +17,12 @@ public class TranslationRequest
 
 public class AOAIMessage
 {
-    [JsonPropertyName("role")]
     public string Role { get; set; }
 
-    [JsonPropertyName("content")]
     public string Content { get; set; }
 }
 
 public class AOAIRequest
 {
-    [JsonPropertyName("messages")]
     public List<AOAIMessage> Messages { get; set; }
 }
