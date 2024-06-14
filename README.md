@@ -25,13 +25,13 @@ docker run -d -p 8080:8080 -e AzureTranslator__Key=********* -e AzureTranslator_
 #### Azure Open AI only
 
 ```bash
-docker run -d -p 8080:8080 -e -AzureOpenAI__Endpoint=****** -AzureOpenAI__Key=********* -AzureOpenAI__DeploymentName=gpt-4o ediwang/editranslator
+docker run -d -p 8080:8080 -e -AzureOpenAI__Endpoint=****** -e AzureOpenAI__Key=********* -e AzureOpenAI__DeploymentName=gpt-4o ediwang/editranslator
 ```
 
 #### Both
 
 ```bash
-docker run -d -p 8080:8080 -e AzureTranslator__Key=********* -e AzureTranslator__Region==********* -AzureOpenAI__Endpoint=****** -AzureOpenAI__Key=********* -AzureOpenAI__DeploymentName=gpt-4o ediwang/editranslator
+docker run -d -p 8080:8080 -e AzureTranslator__Key=********* -e AzureTranslator__Region==********* -e AzureOpenAI__Endpoint=****** -e AzureOpenAI__Key=********* -e AzureOpenAI__DeploymentName=gpt-4o ediwang/editranslator
 ```
 
 ### Code Deployment
@@ -70,8 +70,3 @@ See `Development` section for setup the project. Then use `Release` configuratio
 - Frontend: Angular
 - Backend: ASP.NET Core
 
-## 免责申明
-
-对于中国访客，我们有一份特定的免责申明。请确保你已经阅读并理解其内容：
-
-- [免责申明（仅限中国访客）](./DISCLAIMER_CN.md)
