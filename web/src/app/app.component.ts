@@ -71,7 +71,7 @@ export class AppComponent implements OnInit {
     }).subscribe(
       {
         next: (response: any) => {
-          this.translatedText = response[0].translations[0].text;
+          this.translatedText = response.translations[0]?.text;
           this.isBusy = false;
 
           this.saveTranslation(

@@ -1,8 +1,8 @@
-﻿using Edi.Translator.Models;
+﻿using Azure.AI.Translation.Text;
+using Azure;
+using Edi.Translator.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using System.Text;
-using System.Text.Json;
 
 namespace Edi.Translator.Controllers;
 
@@ -10,8 +10,7 @@ namespace Edi.Translator.Controllers;
 [Route("api/[controller]")]
 public class TranslationController(
     IConfiguration configuration,
-    ILogger<TranslationController> logger,
-    HttpClient httpClient)
+    ILogger<TranslationController> logger)
     : ControllerBase
 {
     [HttpPost("translate")]
@@ -21,29 +20,16 @@ public class TranslationController(
         try
         {
             var endpoint = configuration["AzureTranslator:Endpoint"];
-            var subscriptionKey = configuration["AzureTranslator:SubscriptionKey"];
+            var apiKey = configuration["AzureTranslator:Key"];
             var region = configuration["AzureTranslator:Region"];
 
-            var route = $"/translate?api-version=3.0&from={request.FromLang}&to={request.ToLang}";
+            var client = new TextTranslationClient(new AzureKeyCredential(apiKey), new(endpoint), region);
+            var response = await client.TranslateAsync(request.ToLang, request.Content, request.FromLang);
 
-            var body = new object[] { new { Text = request.Content } };
-            var requestBody = JsonSerializer.Serialize(body);
+            var translations = response.Value;
+            var translation = translations.FirstOrDefault();
 
-            using var requestMessage = new HttpRequestMessage(HttpMethod.Post, endpoint + route);
-            requestMessage.Content = new StringContent(requestBody, Encoding.UTF8, "application/json");
-            requestMessage.Headers.Add("Ocp-Apim-Subscription-Key", subscriptionKey);
-            requestMessage.Headers.Add("Ocp-Apim-Subscription-Region", region);
-
-            var response = await httpClient.SendAsync(requestMessage);
-            response.EnsureSuccessStatusCode();
-
-            var responseObject = await response.Content.ReadFromJsonAsync<List<TranslationResponse>>(
-                new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
-
-            return Ok(responseObject);
+            return Ok(translation);
         }
         catch (Exception ex)
         {

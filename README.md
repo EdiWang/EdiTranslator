@@ -16,7 +16,7 @@ A simple Web UI that uses the Azure AI Translator API to translate text from one
 ### Docker
 
 ```bash
-docker run -d -p 8080:8080 -e AzureTranslator__SubscriptionKey=********* -e AzureTranslator__Region==********* ediwang/editranslator
+docker run -d -p 8080:8080 -e AzureTranslator__Key=********* -e AzureTranslator__Region==********* ediwang/editranslator
 ```
 
 ### Code Deployment
