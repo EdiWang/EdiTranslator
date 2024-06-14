@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { LanguageChoice } from './models';
+import { ApiProvider, LanguageChoice } from './models';
 import { AzureTranslatorProxyService } from '../services/azure-translator-proxy.service';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { TranslationHistory, TranslationHistoryService } from '../services/translation-history.service';
@@ -34,6 +34,11 @@ export class AppComponent implements OnInit {
     { Code: 'vi', Name: 'Tiếng Việt (Vietnamese)' }
   ];
 
+  providerList: ApiProvider[] = [
+    { Code: 'azure-translator', Name: 'Azure Translator (Text)' },
+    { Code: 'aoai-gpt4o', Name: 'Azure Open AI (GPT-4o)' }
+  ]
+
   maxTextLength: number = 5000;
   isBusy: boolean = false;
   translatedText = '';
@@ -56,7 +61,8 @@ export class AppComponent implements OnInit {
     this.sourceForm = this.formBuilder.group({
       sourceText: ['', [Validators.required]],
       sourceLanguage: [this.languageList[0].Code, [Validators.required]],
-      targetLanguage: [this.languageList[2].Code, [Validators.required]]
+      targetLanguage: [this.languageList[2].Code, [Validators.required]],
+      provider: [this.providerList[0].Code, [Validators.required]]
     })
   }
 
@@ -64,11 +70,14 @@ export class AppComponent implements OnInit {
     this.isBusy = true;
     this.errorMessage = '';
 
-    this.azureTranslatorProxyService.translate({
-      Content: this.sourceForm?.controls['sourceText']?.value,
-      FromLang: this.sourceForm?.controls['sourceLanguage']?.value,
-      ToLang: this.sourceForm?.controls['targetLanguage']?.value
-    }).subscribe(
+    this.azureTranslatorProxyService.translate(
+      {
+        Content: this.sourceForm?.controls['sourceText']?.value,
+        FromLang: this.sourceForm?.controls['sourceLanguage']?.value,
+        ToLang: this.sourceForm?.controls['targetLanguage']?.value
+      },
+      this.sourceForm?.controls['provider']?.value
+    ).subscribe(
       {
         next: (response: any) => {
           this.translatedText = response.translations[0]?.text;
@@ -78,7 +87,8 @@ export class AppComponent implements OnInit {
             this.languageList.find(l => l.Code === this.sourceForm.controls['sourceLanguage'].value)!,
             this.languageList.find(l => l.Code === this.sourceForm.controls['targetLanguage'].value)!,
             this.sourceForm.controls['sourceText'].value,
-            this.translatedText
+            this.translatedText,
+            this.providerList.find(p => p.Code === this.sourceForm.controls['provider'].value)!
           );
 
           this.loadTranslations();
@@ -114,8 +124,8 @@ export class AppComponent implements OnInit {
       .sort((a, b) => b.Id - a.Id); // Sort by Id in descending order
   }
 
-  saveTranslation(sourceLanguage: LanguageChoice, targetLanguage: LanguageChoice, sourceText: string, translatedText: string) {
-    this.translationHistoryService.saveTranslation(sourceLanguage, targetLanguage, sourceText, translatedText);
+  saveTranslation(sourceLanguage: LanguageChoice, targetLanguage: LanguageChoice, sourceText: string, translatedText: string, provider: ApiProvider) {
+    this.translationHistoryService.saveTranslation(sourceLanguage, targetLanguage, sourceText, translatedText, provider);
   }
 
   getTranslation(id: number) {
@@ -140,13 +150,13 @@ export class AppComponent implements OnInit {
     console.log(`Translation with ID ${id} has been deleted.`);
   }
 
-  // debug
   loadTranslation(translation: TranslationHistory): void {
     console.log(translation);
 
     this.sourceForm.controls['sourceLanguage'].setValue(translation.SourceLanguage.Code);
     this.sourceForm.controls['targetLanguage'].setValue(translation.TargetLanguage.Code);
     this.sourceForm.controls['sourceText'].setValue(translation.SourceText);
+    this.sourceForm.controls['provider'].setValue(translation.Provider);
     this.translatedText = translation.TranslatedText;
   }
 }

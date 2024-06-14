@@ -14,9 +14,9 @@
   </div>
   <div class="row">
     <div class="col-lg-9">
-      <div class="row">
-        <div class="col-md-12 col-lg-6">
-          <form class="form-source" [formGroup]="sourceForm" (ngSubmit)="onTranslate()">
+      <form class="form-source" [formGroup]="sourceForm" (ngSubmit)="onTranslate()">
+        <div class="row">
+          <div class="col-md-12 col-lg-6">
             <section class="translator-text-container">
               <!--Toolbar-->
               <div class="d-flex lang-selector-bar">
@@ -45,28 +45,28 @@
                 [disabled]="!sourceForm.valid">Translate</fluent-button>
               <fluent-button type="button" appearance="light" (click)="clear()">Clear</fluent-button>
             </div>
-          </form>
-        </div>
-        <div class="col-md-12 col-lg-6">
-          <section class="translator-text-container">
-            <!-- <div>
-              <fluent-select title="Font size" ngDefaultControl>
-                <fluent-option value="14px">14px</fluent-option>
-              </fluent-select>
-            </div> -->
-            <div class="translated-text-container">
-              {{ translatedText }}
+          </div>
+          <div class="col-md-12 col-lg-6">
+            <section class="translator-text-container">
+              <div>
+                <fluent-select title="API" formControlName="provider" ngDefaultControl>
+                  <fluent-option *ngFor="let p of providerList" [value]="p.Code">{{ p.Name }}</fluent-option>
+                </fluent-select>
+              </div>
+              <div class="translated-text-container">
+                {{ translatedText }}
+              </div>
+              <div class="char-count">
+                {{ translatedText.length }} character(s)
+              </div>
+            </section>
+            <div class="mt-2">
+              <fluent-button type="button" appearance="accent" (click)="copyTranslatedText()"
+                [disabled]="translatedText.length == 0">Copy</fluent-button>
             </div>
-            <div class="char-count">
-              {{ translatedText.length }} character(s)
-            </div>
-          </section>
-          <div class="mt-2">
-            <fluent-button type="button" appearance="accent" (click)="copyTranslatedText()"
-              [disabled]="translatedText.length == 0">Copy</fluent-button>
           </div>
         </div>
-      </div>
+      </form>
     </div>
     <div class="col-lg-3">
       <h3>History</h3>
@@ -75,7 +75,7 @@
         <ul class="translation-list">
           <li *ngFor="let translation of translations">
             <fluent-card class="translation-item mb-3">
-              <div class="hs-date mb-2">{{ translation.Date | date:'short' }}</div>
+              <div class="hs-date mb-2">{{ translation.Date | date:'short' }}, {{ translation.Provider?.Name }}</div>
 
               <div>
                 <strong>{{ translation.SourceLanguage.Name }}</strong>
@@ -87,7 +87,8 @@
               </div>
               <div class="mb-2">{{ translation.TranslatedText }}</div>
 
-              <fluent-button appearance="outline" class="me-2" (click)="loadTranslation(translation); $event.stopPropagation()">Load</fluent-button>
+              <fluent-button appearance="outline" class="me-2"
+                (click)="loadTranslation(translation); $event.stopPropagation()">Load</fluent-button>
 
               <fluent-button appearance="outline"
                 (click)="deleteTranslation(translation.Id); $event.stopPropagation()">Delete</fluent-button>

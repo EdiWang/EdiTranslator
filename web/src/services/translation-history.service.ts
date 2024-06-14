@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { LanguageChoice } from "../app/models";
+import { ApiProvider, LanguageChoice } from "../app/models";
 
 export interface TranslationHistory {
     Id: number;
@@ -8,6 +8,7 @@ export interface TranslationHistory {
     SourceText: string;
     TranslatedText: string;
     Date: Date;
+    Provider?: ApiProvider;
 }
 
 @Injectable({
@@ -31,7 +32,10 @@ export class TranslationHistoryService {
         return history.length > 0 ? Math.max(...history.map(h => h.Id)) + 1 : 1;
     }
 
-    saveTranslation(sourceLanguage: LanguageChoice, targetLanguage: LanguageChoice, sourceText: string, translatedText: string): void {
+    saveTranslation(
+        sourceLanguage: LanguageChoice, targetLanguage: LanguageChoice,
+        sourceText: string, translatedText: string,
+        provider: ApiProvider): void {
         const history = this.getHistory();
         const newTranslation: TranslationHistory = {
             Id: this.generateNewId(history),
@@ -39,7 +43,8 @@ export class TranslationHistoryService {
             TargetLanguage: targetLanguage,
             SourceText: sourceText,
             TranslatedText: translatedText,
-            Date: new Date()
+            Date: new Date(),
+            Provider: provider
         };
         history.push(newTranslation);
         this.saveHistory(history);

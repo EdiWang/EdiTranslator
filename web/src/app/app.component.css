@@ -37,7 +37,6 @@ section.translator-text-container {
 }
 
 .translated-text-container {
-    margin-top: 41px;
     background-color: #F2F2F2;
     min-height: 264px;
     max-height: calc(100vh - 200px);
