@@ -34,7 +34,7 @@ public class TranslationController(
         catch (Exception ex)
         {
             logger.LogError(ex, "Error occurred while translating text.");
-            return StatusCode(500, "Internal server error.");
+            return StatusCode(500, ex.Message);
         }
     }
 }
