@@ -1,9 +1,8 @@
-using Edi.AzureTranslatorProxy.Auth;
-using Edi.AzureTranslatorProxy.Configuration;
+using Edi.Translator.Configuration;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
 
-namespace Edi.AzureTranslatorProxy;
+namespace Edi.Translator;
 
 public class Program
 {
@@ -45,18 +44,6 @@ public class Program
             AddLimiter("TranslateLimiter", 5, TimeSpan.FromSeconds(1));
         });
 
-        if (bool.Parse(builder.Configuration["EnableApiKeyAuthentication"]!))
-        {
-            builder.Services.Configure<List<ApiKey>>(builder.Configuration.GetSection("ApiKeys"));
-            builder.Services.AddScoped<IGetApiKeyQuery, AppSettingsGetApiKeyQuery>();
-            builder.Services.AddAuthentication(options =>
-                {
-                    options.DefaultAuthenticateScheme = ApiKeyAuthenticationOptions.DefaultScheme;
-                    options.DefaultChallengeScheme = ApiKeyAuthenticationOptions.DefaultScheme;
-                })
-                .AddApiKeySupport(options => { });
-        }
-
         var app = builder.Build();
 
         if (app.Environment.IsDevelopment())
@@ -67,7 +54,9 @@ public class Program
 
         app.UseHttpsRedirection();
 
-        app.UseAuthentication();
+        app.UseDefaultFiles();
+        app.UseStaticFiles();
+
         app.UseAuthorization();
 
         app.MapControllers();

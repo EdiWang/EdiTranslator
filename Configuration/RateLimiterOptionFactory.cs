@@ -1,6 +1,6 @@
 ﻿using System.Threading.RateLimiting;
 
-namespace Edi.AzureTranslatorProxy.Configuration;
+namespace Edi.Translator.Configuration;
 
 public class RateLimiterOptionFactory
 {

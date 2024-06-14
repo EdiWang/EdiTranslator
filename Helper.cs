@@ -1,4 +1,4 @@
-﻿namespace Edi.AzureTranslatorProxy;
+﻿namespace Edi.Translator;
 
 public class Helper
 {
