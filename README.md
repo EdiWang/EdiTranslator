@@ -48,3 +48,9 @@ See `Development` section for setup the project. Then use `Release` configuratio
 - AI: Azure Translator API
 - Frontend: Angular
 - Backend: ASP.NET Core
+
+## 免责申明
+
+对于中国访客，我们有一份特定的免责申明。请确保你已经阅读并理解其内容：
+
+- [免责申明（仅限中国访客）](./DISCLAIMER_CN.md)
