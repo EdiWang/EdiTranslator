@@ -3,6 +3,9 @@ using Azure;
 using Edi.Translator.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using static System.Net.Mime.MediaTypeNames;
+using System.Text;
+using System.Text.Json;
 
 namespace Edi.Translator.Controllers;
 
@@ -10,7 +13,8 @@ namespace Edi.Translator.Controllers;
 [Route("api/[controller]")]
 public class TranslationController(
     IConfiguration configuration,
-    ILogger<TranslationController> logger)
+    ILogger<TranslationController> logger,
+    HttpClient httpClient)
     : ControllerBase
 {
     [HttpPost("translate")]
@@ -39,6 +43,53 @@ public class TranslationController(
             var translation = translations.FirstOrDefault();
 
             return Ok(translation);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error occurred while translating text.");
+            return StatusCode(500, ex.Message);
+        }
+    }
+
+    [HttpPost("translate/oai")]
+    [EnableRateLimiting("TranslateLimiter")]
+    public async Task<IActionResult> TranslateByOpenAI([FromBody] TranslationRequest request)
+    {
+        // TODO: Refact to typed http client, extract model name to configuration
+        try
+        {
+            var endpoint = configuration["AzureOpenAI:Endpoint"];
+            var apiKey = configuration["AzureOpenAI:Key"];
+
+            httpClient.DefaultRequestHeaders.Add("api-key", $"{apiKey}");
+
+            var requestBody = new AOAIRequest
+            {
+                Messages =
+                [
+                    new()
+                    {
+                        Role = "system",
+                        Content = "You are a professional translator. I will give you language code like 'zh-CN', 'en-US', and a content. You will help me translate text from one language to another language."
+                    },
+
+                    new()
+                    {
+                        Role = "user",
+                        Content = $"Translate the following text from {request.FromLang} to {request.ToLang}: {request.Content}"
+                    }
+                ]
+            };
+
+            var content = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await httpClient.PostAsync($"{endpoint}/openai/deployments/gpt-4o/chat/completions?api-version=2024-02-15-preview", content);
+            response.EnsureSuccessStatusCode();
+
+            string responseBody = await response.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<AOAIResponse>(responseBody);
+
+            return Ok(result.choices[0]?.message);
         }
         catch (Exception ex)
         {
