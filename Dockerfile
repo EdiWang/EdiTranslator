@@ -1,6 +1,7 @@
-#See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+LABEL maintainer="edi.wang@outlook.com"
+LABEL repo="https://github.com/EdiWang/EdiTranslator"
+
 USER app
 WORKDIR /app
 EXPOSE 8080
@@ -9,6 +10,11 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+
+# Install Node.js
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs
+
 COPY ["Edi.Translator.csproj", "."]
 RUN dotnet restore "./Edi.Translator.csproj"
 COPY . .
