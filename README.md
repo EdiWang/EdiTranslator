@@ -2,7 +2,7 @@
 
 A simple Web UI that uses the Azure Translator API and Azure Open AI to translate text from one language to another. 
 
-![image](https://github.com/EdiWang/EdiTranslator/assets/3304703/8b3de68c-f6aa-46c2-8ca9-a534d878d111)
+![image](https://github.com/EdiWang/EdiTranslator/assets/3304703/a29edb4e-8d61-4db6-9c85-e1e7c7ecab8e)
 
 ## Features
 
