@@ -70,10 +70,6 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
-          "options": {
-            "proxyConfig": "src/proxy.conf.json",
-            "buildTarget": "edi-translator:build"
-          },
           "configurations": {
             "production": {
               "buildTarget": "edi-translator:build:production"
