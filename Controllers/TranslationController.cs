@@ -4,8 +4,6 @@ using Edi.Translator.Models;
 using Edi.Translator.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using System.Text;
-using System.Text.Json;
 
 namespace Edi.Translator.Controllers;
 

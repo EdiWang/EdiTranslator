@@ -1,6 +1,6 @@
 ﻿using Edi.Translator.Models;
-using System.Text.Json;
 using System.Text;
+using System.Text.Json;
 
 namespace Edi.Translator.Services;
 
@@ -13,9 +13,9 @@ public class AOAIClient : IAOAIClient
 {
     private readonly IConfiguration _configuration;
     private readonly HttpClient _httpClient;
-    
+
     public AOAIClient(
-        IConfiguration configuration, 
+        IConfiguration configuration,
         HttpClient httpClient)
     {
         _configuration = configuration;
