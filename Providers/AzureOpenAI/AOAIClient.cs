@@ -6,7 +6,7 @@ namespace Edi.Translator.Providers.AzureOpenAI;
 
 public interface IAOAIClient
 {
-    Task<AOAIResponse> TranslateAsync(string fromLang, string toLang, string content);
+    Task<AOAIResponse> TranslateAsync(string fromLang, string toLang, string content, string deploymentName);
 }
 
 public class AOAIClient : IAOAIClient
@@ -27,10 +27,8 @@ public class AOAIClient : IAOAIClient
         _httpClient.DefaultRequestHeaders.Add("api-key", $"{apiKey}");
     }
 
-    public async Task<AOAIResponse> TranslateAsync(string fromLang, string toLang, string content)
+    public async Task<AOAIResponse> TranslateAsync(string fromLang, string toLang, string content, string deploymentName)
     {
-        var deploymentName = _configuration["AzureOpenAI:DeploymentName"];
-
         var requestBody = new AOAIRequest
         {
             Messages =

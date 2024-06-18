@@ -55,13 +55,22 @@ public class TranslationController(
         }
     }
 
-    [HttpPost("aoai")]
+    [HttpPost("aoai/{deploymentName}")]
     [EnableRateLimiting("TranslateLimiter")]
-    public async Task<IActionResult> TranslateByOpenAI([FromBody] TranslationRequest request)
+    public async Task<IActionResult> TranslateByOpenAI([FromBody] TranslationRequest request, string deploymentName)
     {
+        var deploymentNames = configuration.GetSection("AzureOpenAI:DeploymentNames").Get<string[]>();
+        if (!deploymentNames.Contains(deploymentName))
+        {
+            var message = "Invalid deployment name.";
+
+            logger.LogError(message);
+            return BadRequest(message);
+        }
+
         try
         {
-            var aoiResult = await aoaiClient.TranslateAsync(request.FromLang, request.ToLang, request.Content);
+            var aoiResult = await aoaiClient.TranslateAsync(request.FromLang, request.ToLang, request.Content, deploymentName);
 
             var result = new TranslationResult
             {
