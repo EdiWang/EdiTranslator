@@ -10,7 +10,7 @@ A simple Web UI that uses the Azure Translator API and Azure Open AI to translat
 - Save translation history
 - API Providers
   - Azure Translator (Text)
-  - Azure Open AI
+  - Azure Open AI (GPT-4o and GPT-3.5 Turbo)
 
 ## How to Run
 
@@ -25,13 +25,13 @@ docker run -d -p 8080:8080 -e AzureTranslator__Key=********* -e AzureTranslator_
 #### Azure Open AI only
 
 ```bash
-docker run -d -p 8080:8080 -e -AzureOpenAI__Endpoint=****** -e AzureOpenAI__Key=********* -e AzureOpenAI__DeploymentName=gpt-4o ediwang/editranslator
+docker run -d -p 8080:8080 -e -AzureOpenAI__Endpoint=****** -e AzureOpenAI__Key=********* -e ediwang/editranslator
 ```
 
 #### Both
 
 ```bash
-docker run -d -p 8080:8080 -e AzureTranslator__Key=********* -e AzureTranslator__Region==********* -e AzureOpenAI__Endpoint=****** -e AzureOpenAI__Key=********* -e AzureOpenAI__DeploymentName=gpt-4o ediwang/editranslator
+docker run -d -p 8080:8080 -e AzureTranslator__Key=********* -e AzureTranslator__Region==********* -e AzureOpenAI__Endpoint=****** -e AzureOpenAI__Key=********* -e ediwang/editranslator
 ```
 
 ### Code Deployment
@@ -43,7 +43,9 @@ See `Development` section for setup the project. Then use `Release` configuratio
 ## Development
 
 0. Create an Azure Translator instace and get the API key and region
-1. Create an Azure Open AI instance, deploy a model and get the API key and endpoint
+1. Create an Azure Open AI instance
+  - Deploy both GPT-4o and GPT 3.5 Turbo model with deployment name as `gpt-4o` and `gpt-35-turbo`
+  - Get the API key and endpoint
 2. Open the solution in Visual Studio
 3. Modify `appsettings.json` or create `appsettings.Development.json` and set your API key and region like this
 
@@ -57,8 +59,7 @@ See `Development` section for setup the project. Then use `Release` configuratio
   "AzureOpenAI": {
     "Endpoint": "https://<your_instance>.openai.azure.com/",
     "Key": "YOUR_AZURE_OPENAI_KEY",
-    "DeploymentName": "gpt-4o"
-  },
+  }
 }
 ```
 
