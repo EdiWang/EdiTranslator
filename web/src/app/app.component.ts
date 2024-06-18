@@ -55,6 +55,7 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.buildForm();
     this.loadTranslations();
+    this.loadUserSelection();
   }
 
   buildForm() {
@@ -69,6 +70,8 @@ export class AppComponent implements OnInit {
   onTranslate() {
     this.isBusy = true;
     this.errorMessage = '';
+
+    this.saveUserSelection();
 
     this.azureTranslatorProxyService.translate(
       {
@@ -100,6 +103,24 @@ export class AppComponent implements OnInit {
         }
       }
     );
+  }
+
+  saveUserSelection() {
+    localStorage.setItem('sourceLanguage', this.sourceForm.controls['sourceLanguage'].value);
+    localStorage.setItem('targetLanguage', this.sourceForm.controls['targetLanguage'].value);
+    localStorage.setItem('apiProvider', this.sourceForm.controls['apiProvider'].value);
+  }
+
+  loadUserSelection() {
+    const sourceLanguage = localStorage.getItem('sourceLanguage');
+    const targetLanguage = localStorage.getItem('targetLanguage');
+    const apiProvider = localStorage.getItem('apiProvider');
+
+    if (sourceLanguage && targetLanguage) {
+      this.sourceForm.controls['sourceLanguage'].setValue(sourceLanguage);
+      this.sourceForm.controls['targetLanguage'].setValue(targetLanguage);
+      this.sourceForm.controls['apiProvider'].setValue(apiProvider);
+    }
   }
 
   swapLanguageSelector() {
@@ -151,7 +172,7 @@ export class AppComponent implements OnInit {
     this.sourceForm.controls['targetLanguage'].setValue(translation.TargetLanguage.Code);
     this.sourceForm.controls['sourceText'].setValue(translation.SourceText);
     this.sourceForm.controls['apiProvider'].setValue(translation.Provider.Code);
-    
+
     this.translatedText = translation.TranslatedText;
   }
 }
