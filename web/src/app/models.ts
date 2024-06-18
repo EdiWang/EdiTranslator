@@ -4,6 +4,6 @@ export interface LanguageChoice {
 }
 
 export interface ApiProvider {
-    Code: string;
     Name: string;
+    ApiRoute: string;
 }

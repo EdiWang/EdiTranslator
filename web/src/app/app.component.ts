@@ -35,8 +35,9 @@ export class AppComponent implements OnInit {
   ];
 
   providerList: ApiProvider[] = [
-    { Code: 'azure-translator', Name: 'Azure Translator (Text)' },
-    { Code: 'aoai', Name: 'Azure Open AI (GPT-4o)' }
+    { Name: 'Azure Translator (Text)', ApiRoute: 'azure-translator' },
+    { Name: 'Azure Open AI (GPT-4o)', ApiRoute: 'aoai/gpt-4o' },
+    { Name: 'Azure Open AI (GPT-3.5 Turbo)', ApiRoute: 'aoai/gpt-35-turbo' }
   ]
 
   maxTextLength: number = 5000;
@@ -63,7 +64,7 @@ export class AppComponent implements OnInit {
       sourceText: ['', [Validators.required]],
       sourceLanguage: [this.languageList[0].Code, [Validators.required]],
       targetLanguage: [this.languageList[2].Code, [Validators.required]],
-      apiProvider: [this.providerList[0].Code, [Validators.required]]
+      apiProvider: [this.providerList[0].ApiRoute, [Validators.required]]
     })
   }
 
@@ -91,7 +92,7 @@ export class AppComponent implements OnInit {
             this.languageList.find(l => l.Code === this.sourceForm.controls['targetLanguage'].value)!,
             this.sourceForm.controls['sourceText'].value,
             this.translatedText,
-            this.providerList.find(p => p.Code === this.sourceForm.controls['apiProvider'].value)!
+            this.providerList.find(p => p.ApiRoute === this.sourceForm.controls['apiProvider'].value)!
           );
 
           this.loadTranslations();
@@ -171,7 +172,7 @@ export class AppComponent implements OnInit {
     this.sourceForm.controls['sourceLanguage'].setValue(translation.SourceLanguage.Code);
     this.sourceForm.controls['targetLanguage'].setValue(translation.TargetLanguage.Code);
     this.sourceForm.controls['sourceText'].setValue(translation.SourceText);
-    this.sourceForm.controls['apiProvider'].setValue(translation.Provider.Code);
+    this.sourceForm.controls['apiProvider'].setValue(translation.Provider.ApiRoute);
 
     this.translatedText = translation.TranslatedText;
   }

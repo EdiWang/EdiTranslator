@@ -50,7 +50,7 @@
             <section class="translator-text-container">
               <div>
                 <fluent-select title="API" formControlName="apiProvider" ngDefaultControl>
-                  <fluent-option *ngFor="let p of providerList" [value]="p.Code">{{ p.Name }}</fluent-option>
+                  <fluent-option *ngFor="let p of providerList" [value]="p.ApiRoute">{{ p.Name }}</fluent-option>
                 </fluent-select>
               </div>
               <div class="translated-text-container">
