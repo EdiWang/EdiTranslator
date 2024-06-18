@@ -25,13 +25,13 @@ docker run -d -p 8080:8080 -e AzureTranslator__Key=********* -e AzureTranslator_
 #### Azure Open AI only
 
 ```bash
-docker run -d -p 8080:8080 -e -AzureOpenAI__Endpoint=****** -e AzureOpenAI__Key=********* -e ediwang/editranslator
+docker run -d -p 8080:8080 -e -AzureOpenAI__Endpoint=****** -e AzureOpenAI__Key=********* ediwang/editranslator
 ```
 
 #### Both
 
 ```bash
-docker run -d -p 8080:8080 -e AzureTranslator__Key=********* -e AzureTranslator__Region==********* -e AzureOpenAI__Endpoint=****** -e AzureOpenAI__Key=********* -e ediwang/editranslator
+docker run -d -p 8080:8080 -e AzureTranslator__Key=********* -e AzureTranslator__Region==********* -e AzureOpenAI__Endpoint=****** -e AzureOpenAI__Key=********* ediwang/editranslator
 ```
 
 ### Code Deployment
