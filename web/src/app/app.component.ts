@@ -68,6 +68,15 @@ export class AppComponent implements OnInit {
     })
   }
 
+  handleKeyDown(event: KeyboardEvent) {
+    if (event.key === 'Enter') {
+      if (event.ctrlKey) {
+        this.onTranslate();
+        return;
+      }
+    }
+  }
+
   onTranslate() {
     this.isBusy = true;
     this.errorMessage = '';

@@ -32,8 +32,8 @@
               </div>
               <!--Textare-->
               <div>
-                <fluent-text-area class="source-text" formControlName="sourceText" name="sourceText" ngDefaultControl
-                  placeholder="Enter text" maxlength="{{ maxTextLength }}" rows="10"
+                <fluent-text-area (keydown)="handleKeyDown($event)" class="source-text" formControlName="sourceText"
+                  name="sourceText" ngDefaultControl placeholder="Enter text" maxlength="{{ maxTextLength }}" rows="10"
                   spellcheck="false"></fluent-text-area>
               </div>
               <div class="char-count">
@@ -41,9 +41,12 @@
               </div>
             </section>
             <div class="mt-2">
-              <fluent-button type="submit" appearance="accent" class="me-2"
-                [disabled]="!sourceForm.valid">Translate</fluent-button>
+              <fluent-button type="button" appearance="accent" class="me-2" [disabled]="!sourceForm.valid"
+                (click)="onTranslate()" title="CTRL + ENTER">Translate</fluent-button>
               <fluent-button type="button" appearance="light" (click)="clear()">Clear</fluent-button>
+            </div>
+            <div class="tips mt-3">
+              <span>Tip: Press CTRL + Enter to submit the form.</span>
             </div>
           </div>
           <div class="col-md-12 col-lg-6">
@@ -104,7 +107,3 @@
     </div>
   </div>
 </main>
-
-<footer>
-  The only translator that won't collect your data
-</footer>

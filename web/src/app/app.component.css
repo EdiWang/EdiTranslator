@@ -44,6 +44,12 @@ section.translator-text-container {
     padding: 8px;
     font-size: 16px;
     line-height: 25px;
+    white-space: pre-line;
+}
+
+.tips {
+    font-size: 12px;
+    color: #666;
 }
 
 .char-count {
