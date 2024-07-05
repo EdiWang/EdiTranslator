@@ -90,6 +90,11 @@ fluent-text-area {
     color: #666;
 }
 
+.history-container {
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}
+
 footer {
     display: flex;
     justify-content: center;

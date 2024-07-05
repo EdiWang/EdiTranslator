@@ -73,29 +73,32 @@
       <h3>History</h3>
 
       <div *ngIf="translations.length > 0; else noHistory">
-        <ul class="translation-list">
-          <li *ngFor="let translation of translations">
-            <fluent-card class="translation-item mb-3">
-              <div class="hs-date mb-2">{{ translation.Date | date:'short' }}, {{ translation.Provider.Name }}</div>
+        <div class="history-container mb-3">
+          <ul class="translation-list">
+            <li *ngFor="let translation of translations">
+              <fluent-card class="translation-item mb-3">
+                <div class="hs-date mb-2">{{ translation.Date | date:'short' }}, {{ translation.Provider.Name }}</div>
 
-              <div>
-                <strong>{{ translation.SourceLanguage.Name }}</strong>
-              </div>
-              <div class="mb-2">{{ translation.SourceText }}</div>
+                <div>
+                  <strong>{{ translation.SourceLanguage.Name }}</strong>
+                </div>
+                <div class="mb-2">{{ translation.SourceText }}</div>
 
-              <div>
-                <strong>{{ translation.TargetLanguage.Name }}</strong>
-              </div>
-              <div class="mb-2">{{ translation.TranslatedText }}</div>
+                <div>
+                  <strong>{{ translation.TargetLanguage.Name }}</strong>
+                </div>
+                <div class="mb-2">{{ translation.TranslatedText }}</div>
 
-              <fluent-button appearance="outline" class="me-2"
-                (click)="loadTranslation(translation); $event.stopPropagation()">Load</fluent-button>
+                <fluent-button appearance="outline" class="me-2"
+                  (click)="loadTranslation(translation); $event.stopPropagation()">Load</fluent-button>
 
-              <fluent-button appearance="outline"
-                (click)="deleteTranslation(translation.Id); $event.stopPropagation()">Delete</fluent-button>
-            </fluent-card>
-          </li>
-        </ul>
+                <fluent-button appearance="outline"
+                  (click)="deleteTranslation(translation.Id); $event.stopPropagation()">Delete</fluent-button>
+              </fluent-card>
+            </li>
+          </ul>
+        </div>
+
         <fluent-button appearance="neutral" (click)="clearTranslations()">Clear All History</fluent-button>
       </div>
 
