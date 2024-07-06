@@ -64,7 +64,14 @@ public class Program
         app.UseHttpsRedirection();
 
         app.UseDefaultFiles();
-        app.UseStaticFiles();
+        app.UseStaticFiles(new StaticFileOptions()
+        {
+            OnPrepareResponse = context =>
+            {
+                context.Context.Response.Headers.TryAdd("Cache-Control", "no-cache, no-store");
+                context.Context.Response.Headers.TryAdd("Expires", "-1");
+            }
+        });
 
         app.UseAuthorization();
 
