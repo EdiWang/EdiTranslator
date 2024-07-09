@@ -9,10 +9,12 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { TranslatorApiInterceptor } from '../interceptors/api.interceptor';
 import { RetryInterceptor } from '../interceptors/retry-http-errors.interceptor';
+import { TranslationHistoryComponent } from './translation-history/translation-history.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    TranslationHistoryComponent
   ],
   imports: [
     BrowserModule,
