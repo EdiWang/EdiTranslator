@@ -10,12 +10,17 @@ export class AzureTranslatorProxyService {
 
     translate(request: TranslationRequest, route: string) {
         let url = `/api/translation/${route}`;
+
+        if (request.FromLang === 'auto-detect') { 
+            request.FromLang = null;
+        }
+
         return this.http.post(url, request);
     }
 }
 
 export interface TranslationRequest {
     Content: string;
-    FromLang: string;
+    FromLang: string | null;
     ToLang: string;
 }

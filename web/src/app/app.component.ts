@@ -13,7 +13,7 @@ import { TranslationHistory, TranslationHistoryService } from '../services/trans
 export class AppComponent implements OnInit {
   sourceForm: FormGroup = new FormGroup({});
   languageList: LanguageChoice[] = [
-    { Code: null, Name: 'Auto-Detect' },
+    { Code: 'auto-detect', Name: 'Auto-Detect' },
     { Code: 'zh-Hans', Name: '简体中文 (Simplified Chinese)' },
     { Code: 'zh-Hant', Name: '繁體中文 (Traditional Chinese)' },
     { Code: 'en-US', Name: 'English (United States)' },
@@ -64,7 +64,7 @@ export class AppComponent implements OnInit {
     this.sourceForm = this.formBuilder.group({
       sourceText: ['', [Validators.required]],
       sourceLanguage: [this.languageList[0].Code],
-      targetLanguage: [this.languageList[2].Code, [Validators.required]],
+      targetLanguage: [this.languageList[3].Code, [Validators.required]],
       apiProvider: [this.providerList[0].ApiRoute, [Validators.required]]
     })
   }
