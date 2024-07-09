@@ -1,5 +1,5 @@
 export interface LanguageChoice {
-    Code: string;
+    Code: string | null;
     Name: string;
 }
 
