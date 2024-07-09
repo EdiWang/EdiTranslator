@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApiProvider, LanguageChoice } from './models';
 import { AzureTranslatorProxyService } from '../services/azure-translator-proxy.service';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { TranslationHistory, TranslationHistoryService } from '../services/translation-history.service';
+import { TranslationHistoryComponent } from './translation-history/translation-history.component';
 
 @Component({
   selector: 'app-root',
@@ -12,6 +13,8 @@ import { TranslationHistory, TranslationHistoryService } from '../services/trans
 })
 export class AppComponent implements OnInit {
   sourceForm: FormGroup = new FormGroup({});
+  @ViewChild("translationHistory") translationHistoryComponent!: TranslationHistoryComponent;
+
   languageList: LanguageChoice[] = [
     { Code: 'auto-detect', Name: 'Auto-Detect' },
     { Code: 'zh-Hans', Name: '简体中文 (Simplified Chinese)' },
@@ -50,13 +53,11 @@ export class AppComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private azureTranslatorProxyService: AzureTranslatorProxyService,
-    private clipboard: Clipboard,
-    private translationHistoryService: TranslationHistoryService) {
+    private clipboard: Clipboard) {
   }
 
   ngOnInit(): void {
     this.buildForm();
-    this.loadTranslations();
     this.loadUserSelection();
   }
 
@@ -97,7 +98,7 @@ export class AppComponent implements OnInit {
           this.translatedText = response.translatedText;
           this.isBusy = false;
 
-          this.saveTranslation(
+          this.translationHistoryComponent.saveTranslation(
             this.languageList.find(l => l.Code === this.sourceForm.controls['sourceLanguage'].value)!,
             this.languageList.find(l => l.Code === this.sourceForm.controls['targetLanguage'].value)!,
             this.sourceForm.controls['sourceText'].value,
@@ -105,7 +106,7 @@ export class AppComponent implements OnInit {
             this.providerList.find(p => p.ApiRoute === this.sourceForm.controls['apiProvider'].value)!
           );
 
-          this.loadTranslations();
+          this.translationHistoryComponent.loadTranslations();
         },
         error: (error) => {
           console.error(error);
@@ -150,33 +151,7 @@ export class AppComponent implements OnInit {
     this.clipboard.copy(this.translatedText);
   }
 
-  loadTranslations(): void {
-    this.translations = this.translationHistoryService.listAllTranslations()
-      .sort((a, b) => b.Id - a.Id); // Sort by Id in descending order
-  }
-
-  saveTranslation(sourceLanguage: LanguageChoice, targetLanguage: LanguageChoice, sourceText: string, translatedText: string, apiProvider: ApiProvider) {
-    this.translationHistoryService.saveTranslation(sourceLanguage, targetLanguage, sourceText, translatedText, apiProvider);
-  }
-
-  getTranslation(id: number) {
-    const translation = this.translationHistoryService.getTranslationById(id);
-    console.log(translation);
-  }
-
-  clearTranslations() {
-    this.translationHistoryService.clearAllTranslations();
-    this.loadTranslations();
-  }
-
-  deleteTranslation(id: number): void {
-    this.translationHistoryService.deleteTranslationById(id);
-    this.loadTranslations();
-  }
-
-  loadTranslation(translation: TranslationHistory): void {
-    console.log(translation);
-
+  loadTranslationToForm(translation: TranslationHistory): void {
     this.sourceForm.controls['sourceLanguage'].setValue(translation.SourceLanguage.Code);
     this.sourceForm.controls['targetLanguage'].setValue(translation.TargetLanguage.Code);
     this.sourceForm.controls['sourceText'].setValue(translation.SourceText);

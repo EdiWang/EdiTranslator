@@ -70,31 +70,6 @@ fluent-text-area {
     font-size: 14px;
 }
 
-.translation-list {
-    list-style-type: none;
-    padding: 0;
-}
-
-.translation-item {
-    padding: 10px;
-    transition: background-color 0.3s;
-    font-size: 14px;
-}
-
-.translation-item:hover {
-    background-color: #f9f9f9;
-}
-
-.hs-date {
-    font-size: 12px;
-    color: #666;
-}
-
-.history-container {
-    max-height: calc(100vh - 200px);
-    overflow-y: auto;
-}
-
 footer {
     display: flex;
     justify-content: center;
