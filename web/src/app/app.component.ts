@@ -142,8 +142,7 @@ export class AppComponent implements OnInit {
   }
 
   clear() {
-    this.sourceForm.reset();
-    this.buildForm();
+    this.sourceForm.controls['sourceText'].setValue('');
     this.translatedText = '';
   }
 
@@ -173,7 +172,6 @@ export class AppComponent implements OnInit {
   deleteTranslation(id: number): void {
     this.translationHistoryService.deleteTranslationById(id);
     this.loadTranslations();
-    console.log(`Translation with ID ${id} has been deleted.`);
   }
 
   loadTranslation(translation: TranslationHistory): void {
