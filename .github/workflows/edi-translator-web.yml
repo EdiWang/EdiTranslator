@@ -1,4 +1,4 @@
-name: Build and deploy .NET Core application to Web App edi-translator-web
+name: Azure Web App
 on:
   push:
     branches:
