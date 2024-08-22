@@ -7,5 +7,5 @@ namespace Edi.Translator.Controllers;
 public class KeepAliveController : ControllerBase
 {
     [HttpGet]
-    public IActionResult Get() => Ok("Session is kept alive");
+    public IActionResult Get() => Ok(new { Message = "Session is kept alive" });
 }
