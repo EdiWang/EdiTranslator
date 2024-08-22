@@ -1,17 +1,19 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApiProvider, LanguageChoice } from './models';
 import { AzureTranslatorProxyService } from '../services/azure-translator-proxy.service';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { TranslationHistory } from '../services/translation-history.service';
 import { TranslationHistoryComponent } from './translation-history/translation-history.component';
+import { Subscription } from 'rxjs';
+import { KeepAliveService } from '../services/keep-alive-service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   sourceForm: FormGroup = new FormGroup({});
   @ViewChild("translationHistory") translationHistoryComponent!: TranslationHistoryComponent;
 
@@ -50,8 +52,12 @@ export class AppComponent implements OnInit {
   errorMessage = '';
   translations: TranslationHistory[] = [];
 
+  private keepAliveInterval: any;
+  private keepAliveSubscription: Subscription | undefined;
+
   constructor(
     private formBuilder: FormBuilder,
+    private keepAliveService: KeepAliveService,
     private azureTranslatorProxyService: AzureTranslatorProxyService,
     private clipboard: Clipboard) {
   }
@@ -59,6 +65,28 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.buildForm();
     this.loadUserSelection();
+
+    this.keepAliveInterval = setInterval(() => {
+      this.keepAliveSubscription = this.keepAliveService.keepSessionAlive().subscribe(
+        {
+          next: (response: any) => {
+            console.log('Session kept alive', response);
+          },
+          error: (error) => {
+            console.error('Error keeping session alive', error);
+          }
+        }
+      );
+    }, 2000);
+  }
+
+  ngOnDestroy() {
+    if (this.keepAliveInterval) {
+      clearInterval(this.keepAliveInterval);
+    }
+    if (this.keepAliveSubscription) {
+      this.keepAliveSubscription.unsubscribe();
+    }
   }
 
   buildForm() {
