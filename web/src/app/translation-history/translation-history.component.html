@@ -2,7 +2,7 @@
     <div class="history-container mb-3">
         <ul class="translation-list">
             <li *ngFor="let translation of translations">
-                <fluent-card class="translation-item mb-3">
+                <fast--card class="translation-item mb-3">
                     <div class="hs-date mb-2">{{ translation.Date | date:'short' }}, {{ translation.Provider.Name }}
                     </div>
 
@@ -16,17 +16,17 @@
                     </div>
                     <div class="mb-2">{{ translation.TranslatedText }}</div>
 
-                    <fluent-button appearance="outline" class="me-2"
-                        (click)="onloadTranslation(translation); $event.stopPropagation()">Load</fluent-button>
+                    <fast--button appearance="outline" class="me-2"
+                        (click)="onloadTranslation(translation); $event.stopPropagation()">Load</fast--button>
 
-                    <fluent-button appearance="outline"
-                        (click)="deleteTranslation(translation.Id); $event.stopPropagation()">Delete</fluent-button>
-                </fluent-card>
+                    <fast--button appearance="outline"
+                        (click)="deleteTranslation(translation.Id); $event.stopPropagation()">Delete</fast--button>
+                </fast--card>
             </li>
         </ul>
     </div>
 
-    <fluent-button appearance="neutral" (click)="clearTranslations()">Clear All History</fluent-button>
+    <fast--button appearance="neutral" (click)="clearTranslations()">Clear All History</fast--button>
 </div>
 
 <ng-template #noHistory>

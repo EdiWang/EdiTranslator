@@ -3,24 +3,24 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { AppModule } from './app/app.module';
 
 import {
-  provideFluentDesignSystem,
-  fluentCard,
-  fluentButton,
-  fluentTextField,
-  fluentTextArea,
-  fluentSelect,
-  fluentOption,
-  fluentProgress
-} from '@fluentui/web-components';
+  provideFASTDesignSystem,
+  fastCard,
+  fastButton,
+  fastTextField,
+  fastTextArea,
+  fastSelect,
+  fastOption,
+  fastProgress
+} from '@microsoft/fast-components';
 
-provideFluentDesignSystem().register(
-  fluentCard(),
-  fluentButton(),
-  fluentTextField(),
-  fluentTextArea(),
-  fluentSelect(),
-  fluentOption(),
-  fluentProgress()
+provideFASTDesignSystem().register(
+  fastCard(),
+  fastButton(),
+  fastTextField(),
+  fastTextArea(),
+  fastSelect(),
+  fastOption(),
+  fastProgress()
 );
 
 platformBrowserDynamic().bootstrapModule(AppModule, {
