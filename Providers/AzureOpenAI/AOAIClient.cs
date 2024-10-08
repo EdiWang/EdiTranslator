@@ -1,5 +1,4 @@
-﻿using Edi.Translator.Models;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
 
 namespace Edi.Translator.Providers.AzureOpenAI;
@@ -11,16 +10,15 @@ public interface IAOAIClient
 
 public class AOAIClient : IAOAIClient
 {
-    private readonly IConfiguration _configuration;
     private readonly HttpClient _httpClient;
 
     public AOAIClient(
         IConfiguration configuration,
         HttpClient httpClient)
     {
-        _configuration = configuration;
-        var endpoint = _configuration["AzureOpenAI:Endpoint"];
-        var apiKey = _configuration["AzureOpenAI:Key"];
+        var configuration1 = configuration;
+        var endpoint = configuration1["AzureOpenAI:Endpoint"];
+        var apiKey = configuration1["AzureOpenAI:Key"];
 
         _httpClient = httpClient;
         _httpClient.BaseAddress = new(endpoint!);
