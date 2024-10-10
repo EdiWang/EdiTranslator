@@ -19,7 +19,6 @@
     "@angular/platform-browser-dynamic": "^18.2.7",
     "@angular/router": "^18.2.7",
     "@fluentui/web-components": "^2.6.1",
-    "@microsoft/fast-element": "^1.13.0",
     "bootstrap": "^5.3.3",
     "lodash-es": "^4.17.21",
     "rxjs": "~7.8.0",
