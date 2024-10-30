@@ -8,9 +8,9 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.ApplicationInsights" Version="2.22.0" />
         <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
-        <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="8.0.8" />
+        <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="8.0.10" />
         <PackageReference Include="Azure.AI.Translation.Text" Version="1.0.0" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.8.1" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
     </ItemGroup>
 
     <Target Name="EnsureNodeVersion" BeforeTargets="Build">
