@@ -10,12 +10,11 @@ import { KeepAliveService } from '../services/keep-alive-service';
 import { NgIf, NgFor } from '@angular/common';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.css',
-  standalone: true,
-  imports: [NgIf, FormsModule, ReactiveFormsModule, NgFor, TranslationHistoryComponent],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA]
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrl: './app.component.css',
+    imports: [NgIf, FormsModule, ReactiveFormsModule, NgFor, TranslationHistoryComponent],
+    schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class AppComponent implements OnInit, OnDestroy {
   sourceForm: FormGroup = new FormGroup({});
