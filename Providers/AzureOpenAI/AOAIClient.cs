@@ -46,7 +46,7 @@ public class AOAIClient : IAOAIClient
         };
 
         var request = new StringContent(JsonSerializer.Serialize(requestBody, AOAISerializeOption.Default), Encoding.UTF8, "application/json");
-        var response = await _httpClient.PostAsync($"/openai/deployments/{deploymentName}/chat/completions?api-version=2024-02-15-preview", request);
+        var response = await _httpClient.PostAsync($"/openai/deployments/{deploymentName}/chat/completions?api-version=2024-08-01-preview", request);
         response.EnsureSuccessStatusCode();
 
         string responseBody = await response.Content.ReadAsStringAsync();
