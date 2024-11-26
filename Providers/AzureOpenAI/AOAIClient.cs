@@ -13,6 +13,8 @@ public class AOAIClient : IAOAIClient
 {
     private readonly AzureOpenAIClient _azureClient;
 
+    private const string SystemPrompt = "You are a professional translator. I will give you language code like 'zh-CN', 'en-US', and a content. You will help me translate text from one language to another language.";
+
     public AOAIClient(IConfiguration configuration)
     {
         var endpoint = configuration["AzureOpenAI:Endpoint"];
@@ -26,7 +28,7 @@ public class AOAIClient : IAOAIClient
     {
         var chatClient = _azureClient.GetChatClient(deploymentName);
 
-        var systemMessage = new SystemChatMessage("You are a professional translator. I will give you language code like 'zh-CN', 'en-US', and a content. You will help me translate text from one language to another language.");
+        var systemMessage = new SystemChatMessage(SystemPrompt);
         var userMessage = new UserChatMessage($"Translate the following text from {fromLang} to {toLang}: {content}");
 
         var response = await chatClient.CompleteChatAsync(systemMessage, userMessage);
