@@ -75,7 +75,7 @@ public class TranslationController(
             var result = new TranslationResult
             {
                 ProviderCode = "aoai",
-                TranslatedText = aoiResult.Choices[0]?.Message.Content
+                TranslatedText = aoiResult.Text
             };
 
             return Ok(result);

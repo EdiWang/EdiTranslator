@@ -21,7 +21,7 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
         builder.Services.AddApplicationInsightsTelemetry();
-        builder.Services.AddHttpClient<IAOAIClient, AOAIClient>();
+        builder.Services.AddScoped<IAOAIClient, AOAIClient>();
 
         builder.Services.Configure<RouteOptions>(options =>
         {
