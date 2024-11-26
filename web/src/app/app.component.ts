@@ -1,5 +1,5 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ApiProvider, LanguageChoice } from './models';
 import { AzureTranslatorProxyService } from '../services/azure-translator-proxy.service';
 import { Clipboard } from '@angular/cdk/clipboard';
@@ -7,11 +7,15 @@ import { TranslationHistory } from '../services/translation-history.service';
 import { TranslationHistoryComponent } from './translation-history/translation-history.component';
 import { Subscription } from 'rxjs';
 import { KeepAliveService } from '../services/keep-alive-service';
+import { NgIf, NgFor } from '@angular/common';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrl: './app.component.css',
+  standalone: true,
+  imports: [NgIf, FormsModule, ReactiveFormsModule, NgFor, TranslationHistoryComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class AppComponent implements OnInit, OnDestroy {
   sourceForm: FormGroup = new FormGroup({});
