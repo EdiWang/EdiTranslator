@@ -46,6 +46,7 @@ export class AppComponent implements OnInit, OnDestroy {
   providerList: ApiProvider[] = [
     { Name: 'Azure Translator (Text)', ApiRoute: 'azure-translator' },
     { Name: 'Azure Open AI (GPT-4o)', ApiRoute: 'aoai/gpt-4o' },
+    { Name: 'Azure Open AI (GPT-4o-mini)', ApiRoute: 'aoai/gpt-4o-mini' },
     { Name: 'Azure Open AI (GPT-3.5 Turbo)', ApiRoute: 'aoai/gpt-35-turbo' }
   ]
 
