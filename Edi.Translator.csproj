@@ -13,7 +13,7 @@
         <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="9.0.0" />
 
         <PackageReference Include="Azure.AI.Translation.Text" Version="1.0.0" />
-        <PackageReference Include="Azure.AI.OpenAI" Version="2.0.0" />
+        <PackageReference Include="Azure.AI.OpenAI" Version="2.1.0" />
 
         <PackageReference Include="Swashbuckle.AspNetCore" Version="7.1.0" />
     </ItemGroup>
