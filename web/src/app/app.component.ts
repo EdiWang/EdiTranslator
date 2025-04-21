@@ -10,11 +10,11 @@ import { KeepAliveService } from '../services/keep-alive-service';
 import { NgIf, NgFor } from '@angular/common';
 
 @Component({
-    selector: 'app-root',
-    templateUrl: './app.component.html',
-    styleUrl: './app.component.css',
-    imports: [NgIf, FormsModule, ReactiveFormsModule, NgFor, TranslationHistoryComponent],
-    schemas: [CUSTOM_ELEMENTS_SCHEMA]
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.css',
+  imports: [NgIf, FormsModule, ReactiveFormsModule, NgFor, TranslationHistoryComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class AppComponent implements OnInit, OnDestroy {
   sourceForm: FormGroup = new FormGroup({});
@@ -47,7 +47,8 @@ export class AppComponent implements OnInit, OnDestroy {
     { Name: 'Azure Translator (Text)', ApiRoute: 'azure-translator' },
     { Name: 'Azure Open AI (GPT-4o)', ApiRoute: 'aoai/gpt-4o' },
     { Name: 'Azure Open AI (GPT-4o-mini)', ApiRoute: 'aoai/gpt-4o-mini' },
-    { Name: 'Azure Open AI (GPT-3.5 Turbo)', ApiRoute: 'aoai/gpt-35-turbo' }
+    { Name: 'Azure Open AI (GPT-4.1)', ApiRoute: 'aoai/gpt-4.1' },
+    { Name: 'Azure Open AI (GPT-4.1-mini)', ApiRoute: 'aoai/gpt-4.1-mini' }
   ]
 
   maxTextLength: number = 5000;
