@@ -6,11 +6,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="System.Text.Json" Version="9.0.4" />
+        <PackageReference Include="System.Text.Json" Version="9.0.5" />
 
         <PackageReference Include="Microsoft.ApplicationInsights" Version="2.23.0" />
         <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.23.0" />
-        <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="9.0.4" />
+        <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="9.0.5" />
 
         <PackageReference Include="Azure.AI.Translation.Text" Version="1.0.0" />
         <PackageReference Include="Azure.AI.OpenAI" Version="2.1.0" />
