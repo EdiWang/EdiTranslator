@@ -9,15 +9,15 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "^20.0.0",
-    "@angular/cdk": "^19.2.18",
-    "@angular/common": "^20.0.0",
-    "@angular/compiler": "^20.0.0",
-    "@angular/core": "^20.0.0",
-    "@angular/forms": "^20.0.0",
-    "@angular/platform-browser": "^20.0.0",
-    "@angular/platform-browser-dynamic": "^20.0.0",
-    "@angular/router": "^20.0.0",
+    "@angular/animations": "^20.0.1",
+    "@angular/cdk": "^20.0.2",
+    "@angular/common": "^20.0.1",
+    "@angular/compiler": "^20.0.1",
+    "@angular/core": "^20.0.1",
+    "@angular/forms": "^20.0.1",
+    "@angular/platform-browser": "^20.0.1",
+    "@angular/platform-browser-dynamic": "^20.0.1",
+    "@angular/router": "^20.0.1",
     "@fluentui/web-components": "^2.6.1",
     "bootstrap": "^5.3.6",
     "lodash-es": "^4.17.21",
@@ -26,9 +26,9 @@
     "zone.js": "^0.15.1"
   },
   "devDependencies": {
-    "@angular/build": "^20.0.0",
-    "@angular/cli": "^20.0.0",
-    "@angular/compiler-cli": "^20.0.0",
+    "@angular/build": "^20.0.1",
+    "@angular/cli": "^20.0.1",
+    "@angular/compiler-cli": "^20.0.1",
     "typescript": "^5.8.3"
   }
 }
