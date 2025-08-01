@@ -1,14 +1,14 @@
+import { CommonModule, DatePipe } from '@angular/common';
 import { Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, OnInit, Output } from '@angular/core';
 import { TranslationHistory, TranslationHistoryService } from '../../services/translation-history.service';
 import { ApiProvider, LanguageChoice } from '../models';
-import { NgIf, NgFor, DatePipe } from '@angular/common';
 
 @Component({
-    selector: 'app-translation-history',
-    templateUrl: './translation-history.component.html',
-    styleUrl: './translation-history.component.css',
-    imports: [NgIf, NgFor, DatePipe],
-    schemas: [CUSTOM_ELEMENTS_SCHEMA]
+  selector: 'app-translation-history',
+  templateUrl: './translation-history.component.html',
+  styleUrl: './translation-history.component.css',
+  imports: [CommonModule, DatePipe],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class TranslationHistoryComponent implements OnInit {
   translations: TranslationHistory[] = [];

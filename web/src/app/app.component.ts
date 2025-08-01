@@ -1,19 +1,19 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ApiProvider, LanguageChoice } from './models';
-import { AzureTranslatorProxyService } from '../services/azure-translator-proxy.service';
 import { Clipboard } from '@angular/cdk/clipboard';
-import { TranslationHistory } from '../services/translation-history.service';
-import { TranslationHistoryComponent } from './translation-history/translation-history.component';
+import { CommonModule } from '@angular/common';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { AzureTranslatorProxyService } from '../services/azure-translator-proxy.service';
 import { KeepAliveService } from '../services/keep-alive-service';
-import { NgIf, NgFor } from '@angular/common';
+import { TranslationHistory } from '../services/translation-history.service';
+import { ApiProvider, LanguageChoice } from './models';
+import { TranslationHistoryComponent } from './translation-history/translation-history.component';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
-  imports: [NgIf, FormsModule, ReactiveFormsModule, NgFor, TranslationHistoryComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, TranslationHistoryComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class AppComponent implements OnInit, OnDestroy {
