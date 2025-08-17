@@ -1,4 +1,5 @@
 using Edi.Translator.Configuration;
+using Edi.Translator.Models;
 using Edi.Translator.Providers.AzureOpenAI;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
@@ -21,6 +22,7 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
         builder.Services.AddApplicationInsightsTelemetry();
+        builder.Services.Configure<AzureOpenAIOptions>(builder.Configuration.GetSection(AzureOpenAIOptions.SectionName));
         builder.Services.AddScoped<IAOAIClient, AOAIClient>();
 
         builder.Services.Configure<RouteOptions>(options =>
@@ -52,6 +54,20 @@ public class Program
 
             AddLimiter("TranslateLimiter", 5, TimeSpan.FromSeconds(1));
         });
+
+        builder.Services.Configure<AzureTranslatorConfig>(
+            builder.Configuration.GetSection(AzureTranslatorConfig.SectionName));
+        builder.Services.Configure<AzureOpenAIConfig>(
+            builder.Configuration.GetSection(AzureOpenAIConfig.SectionName));
+
+        builder.Services.AddOptions<AzureTranslatorConfig>()
+            .BindConfiguration(AzureTranslatorConfig.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+        builder.Services.AddOptions<AzureOpenAIConfig>()
+            .BindConfiguration(AzureOpenAIConfig.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
         var app = builder.Build();
 

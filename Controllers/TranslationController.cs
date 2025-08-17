@@ -4,73 +4,123 @@ using Edi.Translator.Models;
 using Edi.Translator.Providers.AzureOpenAI;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.Options;
 
 namespace Edi.Translator.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 public class TranslationController(
-    IConfiguration configuration,
+    IOptions<AzureTranslatorConfig> translatorConfig,
+    IOptions<AzureOpenAIConfig> openAIConfig,
     ILogger<TranslationController> logger,
     IAOAIClient aoaiClient)
     : ControllerBase
 {
+    private readonly AzureTranslatorConfig _translatorConfig = translatorConfig.Value;
+    private readonly AzureOpenAIConfig _openAIConfig = openAIConfig.Value;
+
     [HttpPost("azure-translator")]
     [EnableRateLimiting("TranslateLimiter")]
-    public async Task<IActionResult> Translate([FromBody] TranslationRequest request)
+    public async Task<IActionResult> Translate([FromBody] TranslationRequest request, CancellationToken cancellationToken = default)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        // Validate configuration
+        var configValidation = ValidateTranslatorConfiguration();
+        if (configValidation != null)
+        {
+            return configValidation;
+        }
+
         try
         {
-            var endpoint = configuration["AzureTranslator:Endpoint"];
-            var apiKey = configuration["AzureTranslator:Key"];
-            var region = configuration["AzureTranslator:Region"];
+            var client = new TextTranslationClient(
+                new AzureKeyCredential(_translatorConfig.Key),
+                new Uri(_translatorConfig.Endpoint),
+                _translatorConfig.Region);
 
-            // check if endpoint, apiKey and region are set
-            if (string.IsNullOrEmpty(endpoint) || string.IsNullOrEmpty(apiKey) || string.IsNullOrEmpty(region))
-            {
-                var message = "Translator configuration is missing.";
-
-                logger.LogError(message);
-                return StatusCode(500, message);
-            }
-
-            var client = new TextTranslationClient(new AzureKeyCredential(apiKey), new(endpoint), region);
-            var response = await client.TranslateAsync(request.ToLang, request.Content, request.FromLang);
+            var response = await client.TranslateAsync(
+                request.ToLang,
+                request.Content,
+                request.FromLang,
+                cancellationToken: cancellationToken);
 
             var translations = response.Value;
-            var translation = translations.FirstOrDefault();
+            if (!translations.Any())
+            {
+                logger.LogWarning("No translations returned from Azure Translator service");
+                return StatusCode(500, "Translation service returned no results");
+            }
+
+            var translation = translations.First();
+            if (!translation.Translations.Any())
+            {
+                logger.LogWarning("No translation text returned from Azure Translator service");
+                return StatusCode(500, "Translation service returned no translation text");
+            }
 
             var result = new TranslationResult
             {
                 ProviderCode = "azure-translator",
-                TranslatedText = translation?.Translations[0].Text
+                TranslatedText = translation.Translations[0].Text,
+                DetectedLanguage = translation.DetectedLanguage?.Language,
+                Confidence = translation.DetectedLanguage?.Confidence
             };
+
+            logger.LogInformation("Successfully translated text using Azure Translator. From: {FromLang}, To: {ToLang}",
+                request.FromLang ?? "auto-detect", request.ToLang);
 
             return Ok(result);
         }
+        catch (RequestFailedException ex)
+        {
+            logger.LogError(ex, "Azure Translator API request failed. Status: {Status}, Error: {Error}",
+                ex.Status, ex.ErrorCode);
+            return StatusCode(503, "Translation service is temporarily unavailable");
+        }
+        catch (OperationCanceledException)
+        {
+            logger.LogWarning("Translation request was cancelled");
+            return StatusCode(408, "Request timeout");
+        }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error occurred while translating text.");
-            return StatusCode(500, ex.Message);
+            logger.LogError(ex, "Unexpected error occurred while translating text");
+            return StatusCode(500, "An unexpected error occurred during translation");
         }
     }
 
     [HttpPost("aoai/{deploymentName}")]
     [EnableRateLimiting("TranslateLimiter")]
-    public async Task<IActionResult> TranslateByOpenAI([FromBody] TranslationRequest request, string deploymentName)
+    public async Task<IActionResult> TranslateByOpenAI(
+        [FromBody] TranslationRequest request,
+        [FromRoute] string deploymentName,
+        CancellationToken cancellationToken = default)
     {
-        var deploymentNames = configuration.GetSection("AzureOpenAI:DeploymentNames").Get<string[]>();
-        if (!deploymentNames.Contains(deploymentName))
+        if (!ModelState.IsValid)
         {
-            var message = "Invalid deployment name.";
+            return BadRequest(ModelState);
+        }
 
-            logger.LogError(message);
-            return BadRequest(message);
+        // Validate deployment name
+        if (!IsValidDeploymentName(deploymentName))
+        {
+            logger.LogWarning("Invalid deployment name requested: {DeploymentName}", deploymentName);
+            return BadRequest($"Invalid deployment name: {deploymentName}");
         }
 
         try
         {
-            var aoiResult = await aoaiClient.TranslateAsync(request.FromLang, request.ToLang, request.Content, deploymentName);
+            var aoiResult = await aoaiClient.TranslateAsync(
+                request.FromLang,
+                request.ToLang,
+                request.Content,
+                deploymentName,
+                cancellationToken);
 
             var result = new TranslationResult
             {
@@ -78,12 +128,45 @@ public class TranslationController(
                 TranslatedText = aoiResult.Text
             };
 
+            logger.LogInformation("Successfully translated text using Azure OpenAI. Deployment: {DeploymentName}, From: {FromLang}, To: {ToLang}",
+                deploymentName, request.FromLang, request.ToLang);
+
             return Ok(result);
+        }
+        catch (OperationCanceledException)
+        {
+            logger.LogWarning("OpenAI translation request was cancelled");
+            return StatusCode(408, "Request timeout");
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error occurred while translating text.");
-            return StatusCode(500, ex.Message);
+            logger.LogError(ex, "Error occurred while translating text using Azure OpenAI. Deployment: {DeploymentName}", deploymentName);
+            return StatusCode(500, "An unexpected error occurred during translation");
         }
+    }
+
+    private ObjectResult ValidateTranslatorConfiguration()
+    {
+        if (string.IsNullOrWhiteSpace(_translatorConfig.Endpoint) ||
+            string.IsNullOrWhiteSpace(_translatorConfig.Key) ||
+            string.IsNullOrWhiteSpace(_translatorConfig.Region))
+        {
+            const string message = "Azure Translator configuration is incomplete";
+            logger.LogError(message);
+            return StatusCode(500, message);
+        }
+
+        return null;
+    }
+
+    private bool IsValidDeploymentName(string deploymentName)
+    {
+        if (string.IsNullOrWhiteSpace(deploymentName))
+        {
+            return false;
+        }
+
+        var deploymentNames = _openAIConfig.DeploymentNames;
+        return deploymentNames?.Contains(deploymentName, StringComparer.OrdinalIgnoreCase) == true;
     }
 }
