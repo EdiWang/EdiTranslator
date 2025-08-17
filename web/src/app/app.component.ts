@@ -1,13 +1,20 @@
 import { Clipboard } from '@angular/cdk/clipboard';
 import { CommonModule } from '@angular/common';
-import { Component, CUSTOM_ELEMENTS_SCHEMA, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { Subject, takeUntil, timer, switchMap, catchError, EMPTY } from 'rxjs';
 import { AzureTranslatorProxyService } from '../services/azure-translator-proxy.service';
 import { KeepAliveService } from '../services/keep-alive-service';
 import { TranslationHistory } from '../services/translation-history.service';
-import { ApiProvider, LanguageChoice } from './models';
+import { ApiProvider, LanguageChoice, TranslationRequest } from './models';
 import { TranslationHistoryComponent } from './translation-history/translation-history.component';
+
+interface FormControls {
+  sourceText: string;
+  sourceLanguage: string;
+  targetLanguage: string;
+  apiProvider: string;
+}
 
 @Component({
   selector: 'app-root',
@@ -17,10 +24,27 @@ import { TranslationHistoryComponent } from './translation-history/translation-h
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class AppComponent implements OnInit, OnDestroy {
-  sourceForm: FormGroup = new FormGroup({});
-  @ViewChild("translationHistory") translationHistoryComponent!: TranslationHistoryComponent;
+  private readonly destroy$ = new Subject<void>();
+  private readonly formBuilder = inject(FormBuilder);
+  private readonly keepAliveService = inject(KeepAliveService);
+  private readonly azureTranslatorProxyService = inject(AzureTranslatorProxyService);
+  private readonly clipboard = inject(Clipboard);
 
-  languageList: LanguageChoice[] = [
+  // Constants
+  private static readonly STORAGE_KEYS = {
+    SOURCE_LANGUAGE: 'sourceLanguage',
+    TARGET_LANGUAGE: 'targetLanguage',
+    API_PROVIDER: 'apiProvider'
+  } as const;
+
+  private static readonly KEEP_ALIVE_INTERVAL = 60 * 1000; // 1 minute
+  private static readonly DEFAULT_LANGUAGE_INDICES = {
+    SOURCE: 0,
+    TARGET: 3
+  } as const;
+
+  readonly maxTextLength = 5000;
+  readonly languageList: readonly LanguageChoice[] = [
     { Code: 'auto-detect', Name: 'Auto-Detect' },
     { Code: 'zh-Hans', Name: '简体中文 (Simplified Chinese)' },
     { Code: 'zh-Hant', Name: '繁體中文 (Traditional Chinese)' },
@@ -43,152 +67,192 @@ export class AppComponent implements OnInit, OnDestroy {
     { Code: 'vi', Name: 'Tiếng Việt (Vietnamese)' }
   ];
 
-  providerList: ApiProvider[] = [
-    { Name: 'Azure Translator (Text)', ApiRoute: 'azure-translator' },
-    { Name: 'Azure Open AI (GPT-4o)', ApiRoute: 'aoai/gpt-4o' },
-    { Name: 'Azure Open AI (GPT-4.1)', ApiRoute: 'aoai/gpt-4.1' },
-    { Name: 'Azure Open AI (GPT-4.1-mini)', ApiRoute: 'aoai/gpt-4.1-mini' }
-  ]
+  readonly providerList: readonly ApiProvider[] = [
+    { Name: 'Azure Translator', ApiRoute: 'azure-translator' },
+    { Name: 'GPT-4.1 (Azure)', ApiRoute: 'aoai/gpt-4.1' },
+    { Name: 'GPT-4.1-mini (Azure)', ApiRoute: 'aoai/gpt-4.1-mini' },
+    { Name: 'GPT-4o (Azure)', ApiRoute: 'aoai/gpt-4o' },
+  ];
 
-  maxTextLength: number = 5000;
-  isBusy: boolean = false;
+  sourceForm!: FormGroup;
+  @ViewChild("translationHistory") translationHistoryComponent!: TranslationHistoryComponent;
+
+  isBusy = false;
   translatedText = '';
   errorMessage = '';
   translations: TranslationHistory[] = [];
 
-  private keepAliveInterval: any;
-  private keepAliveSubscription: Subscription | undefined;
-
-  constructor(
-    private formBuilder: FormBuilder,
-    private keepAliveService: KeepAliveService,
-    private azureTranslatorProxyService: AzureTranslatorProxyService,
-    private clipboard: Clipboard) {
+  ngOnInit(): void {
+    this.initializeComponent();
   }
 
-  ngOnInit(): void {
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private initializeComponent(): void {
     this.buildForm();
     this.loadUserSelection();
-
-    this.keepAliveInterval = setInterval(() => {
-      this.keepAliveSubscription = this.keepAliveService.keepSessionAlive().subscribe(
-        {
-          next: (response: any) => {
-            console.log('Session kept alive', response);
-          },
-          error: (error) => {
-            console.error('Error keeping session alive', error);
-          }
-        }
-      );
-    }, 1 * 60 * 1000);
+    this.startKeepAlive();
   }
 
-  ngOnDestroy() {
-    if (this.keepAliveInterval) {
-      clearInterval(this.keepAliveInterval);
-    }
-    if (this.keepAliveSubscription) {
-      this.keepAliveSubscription.unsubscribe();
-    }
-  }
-
-  buildForm() {
+  private buildForm(): void {
     this.sourceForm = this.formBuilder.group({
       sourceText: ['', [Validators.required]],
-      sourceLanguage: [this.languageList[0].Code],
-      targetLanguage: [this.languageList[3].Code, [Validators.required]],
+      sourceLanguage: [this.languageList[AppComponent.DEFAULT_LANGUAGE_INDICES.SOURCE].Code],
+      targetLanguage: [this.languageList[AppComponent.DEFAULT_LANGUAGE_INDICES.TARGET].Code, [Validators.required]],
       apiProvider: [this.providerList[0].ApiRoute, [Validators.required]]
-    })
+    });
   }
 
-  handleKeyDown(event: KeyboardEvent) {
-    if (event.key === 'Enter') {
-      if (event.ctrlKey) {
-        this.onTranslate();
-        return;
-      }
+  private startKeepAlive(): void {
+    timer(0, AppComponent.KEEP_ALIVE_INTERVAL)
+      .pipe(
+        switchMap(() => this.keepAliveService.keepSessionAlive()),
+        catchError((error) => {
+          console.error('Error keeping session alive', error);
+          return EMPTY;
+        }),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((response) => {
+        console.log('Session kept alive', response);
+      });
+  }
+
+  handleKeyDown(event: KeyboardEvent): void {
+    if (event.key === 'Enter' && event.ctrlKey) {
+      event.preventDefault();
+      this.onTranslate();
     }
   }
 
-  onTranslate() {
+  onTranslate(): void {
+    if (this.sourceForm.invalid || this.isBusy) {
+      return;
+    }
+
     this.isBusy = true;
     this.errorMessage = '';
-
     this.saveUserSelection();
 
-    this.azureTranslatorProxyService.translate(
-      {
-        Content: this.sourceForm?.controls['sourceText']?.value,
-        FromLang: this.sourceForm?.controls['sourceLanguage']?.value,
-        ToLang: this.sourceForm?.controls['targetLanguage']?.value
-      },
-      this.sourceForm?.controls['apiProvider']?.value
-    ).subscribe(
-      {
-        next: (response: any) => {
-          this.translatedText = response.translatedText;
-          this.isBusy = false;
+    const formValue = this.sourceForm.value as FormControls;
+    const translationRequest: TranslationRequest = {
+      Content: formValue.sourceText,
+      FromLang: formValue.sourceLanguage,
+      ToLang: formValue.targetLanguage
+    };
 
-          this.translationHistoryComponent.saveTranslation(
-            this.languageList.find(l => l.Code === this.sourceForm.controls['sourceLanguage'].value)!,
-            this.languageList.find(l => l.Code === this.sourceForm.controls['targetLanguage'].value)!,
-            this.sourceForm.controls['sourceText'].value,
-            this.translatedText,
-            this.providerList.find(p => p.ApiRoute === this.sourceForm.controls['apiProvider'].value)!
-          );
-
-          this.translationHistoryComponent.loadTranslations();
-        },
-        error: (error) => {
-          console.error(error);
+    this.azureTranslatorProxyService
+      .translate(translationRequest, formValue.apiProvider)
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError((error) => {
+          console.error('Translation error:', error);
           this.errorMessage = 'An error occurred while translating the text.';
           this.isBusy = false;
-        }
-      }
-    );
+          return EMPTY;
+        })
+      )
+      .subscribe((response) => {
+        this.handleTranslationSuccess(response, formValue);
+      });
   }
 
-  saveUserSelection() {
-    localStorage.setItem('sourceLanguage', this.sourceForm.controls['sourceLanguage'].value);
-    localStorage.setItem('targetLanguage', this.sourceForm.controls['targetLanguage'].value);
-    localStorage.setItem('apiProvider', this.sourceForm.controls['apiProvider'].value);
-  }
+  private handleTranslationSuccess(response: any, formValue: FormControls): void {
+    this.translatedText = response.translatedText;
+    this.isBusy = false;
 
-  loadUserSelection() {
-    const sourceLanguage = localStorage.getItem('sourceLanguage');
-    const targetLanguage = localStorage.getItem('targetLanguage');
-    const apiProvider = localStorage.getItem('apiProvider');
+    const sourceLanguage = this.findLanguageByCode(formValue.sourceLanguage);
+    const targetLanguage = this.findLanguageByCode(formValue.targetLanguage);
+    const provider = this.findProviderByRoute(formValue.apiProvider);
 
-    if (sourceLanguage && targetLanguage) {
-      this.sourceForm.controls['sourceLanguage'].setValue(sourceLanguage);
-      this.sourceForm.controls['targetLanguage'].setValue(targetLanguage);
-      this.sourceForm.controls['apiProvider'].setValue(apiProvider);
+    if (sourceLanguage && targetLanguage && provider) {
+      this.translationHistoryComponent.saveTranslation(
+        sourceLanguage,
+        targetLanguage,
+        formValue.sourceText,
+        this.translatedText,
+        provider
+      );
+      this.translationHistoryComponent.loadTranslations();
     }
   }
 
-  swapLanguageSelector() {
-    const sourceLanguage = this.sourceForm.controls['sourceLanguage'].value;
-    const targetLanguage = this.sourceForm.controls['targetLanguage'].value;
-    this.sourceForm.controls['sourceLanguage'].setValue(targetLanguage);
-    this.sourceForm.controls['targetLanguage'].setValue(sourceLanguage);
+  private findLanguageByCode(code: string): LanguageChoice | undefined {
+    return this.languageList.find(l => l.Code === code);
   }
 
-  clear() {
-    this.sourceForm.controls['sourceText'].setValue('');
+  private findProviderByRoute(route: string): ApiProvider | undefined {
+    return this.providerList.find(p => p.ApiRoute === route);
+  }
+
+  private saveUserSelection(): void {
+    const formValue = this.sourceForm.value as FormControls;
+    
+    try {
+      localStorage.setItem(AppComponent.STORAGE_KEYS.SOURCE_LANGUAGE, formValue.sourceLanguage);
+      localStorage.setItem(AppComponent.STORAGE_KEYS.TARGET_LANGUAGE, formValue.targetLanguage);
+      localStorage.setItem(AppComponent.STORAGE_KEYS.API_PROVIDER, formValue.apiProvider);
+    } catch (error) {
+      console.warn('Failed to save user selection to localStorage:', error);
+    }
+  }
+
+  private loadUserSelection(): void {
+    try {
+      const sourceLanguage = localStorage.getItem(AppComponent.STORAGE_KEYS.SOURCE_LANGUAGE);
+      const targetLanguage = localStorage.getItem(AppComponent.STORAGE_KEYS.TARGET_LANGUAGE);
+      const apiProvider = localStorage.getItem(AppComponent.STORAGE_KEYS.API_PROVIDER);
+
+      if (sourceLanguage && targetLanguage && apiProvider) {
+        this.sourceForm.patchValue({
+          sourceLanguage,
+          targetLanguage,
+          apiProvider
+        });
+      }
+    } catch (error) {
+      console.warn('Failed to load user selection from localStorage:', error);
+    }
+  }
+
+  swapLanguageSelector(): void {
+    const currentValues = this.sourceForm.value as FormControls;
+    
+    // Don't swap if source is auto-detect
+    if (currentValues.sourceLanguage === 'auto-detect') {
+      return;
+    }
+
+    this.sourceForm.patchValue({
+      sourceLanguage: currentValues.targetLanguage,
+      targetLanguage: currentValues.sourceLanguage
+    });
+  }
+
+  clear(): void {
+    this.sourceForm.patchValue({ sourceText: '' });
     this.translatedText = '';
+    this.errorMessage = '';
   }
 
-  copyTranslatedText() {
-    this.clipboard.copy(this.translatedText);
+  copyTranslatedText(): void {
+    if (this.translatedText) {
+      this.clipboard.copy(this.translatedText);
+    }
   }
 
   loadTranslationToForm(translation: TranslationHistory): void {
-    this.sourceForm.controls['sourceLanguage'].setValue(translation.SourceLanguage.Code);
-    this.sourceForm.controls['targetLanguage'].setValue(translation.TargetLanguage.Code);
-    this.sourceForm.controls['sourceText'].setValue(translation.SourceText);
-    this.sourceForm.controls['apiProvider'].setValue(translation.Provider.ApiRoute);
+    this.sourceForm.patchValue({
+      sourceLanguage: translation.SourceLanguage.Code,
+      targetLanguage: translation.TargetLanguage.Code,
+      sourceText: translation.SourceText,
+      apiProvider: translation.Provider.ApiRoute
+    });
 
     this.translatedText = translation.TranslatedText;
+    this.errorMessage = '';
   }
 }
