@@ -15,7 +15,7 @@
         <PackageReference Include="Azure.AI.Translation.Text" Version="1.0.0" />
         <PackageReference Include="Azure.AI.OpenAI" Version="2.1.0" />
 
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.4" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6" />
     </ItemGroup>
 
     <Target Name="EnsureNodeVersion" BeforeTargets="Build">
