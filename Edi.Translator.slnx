@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".github/workflows/docker-image.yml" />
+    <File Path=".github/workflows/edi-translator-web.yml" />
+  </Folder>
+  <Project Path="Edi.Translator.csproj" />
+</Solution>
