@@ -1,34 +1,32 @@
-<div *ngIf="translations.length > 0; else noHistory">
+@if (translations.length > 0) {
+  <div>
     <div class="history-container mb-3">
-        <ul class="translation-list">
-            <li *ngFor="let translation of translations">
-                <fluent-card class="translation-item mb-3">
-                    <div class="hs-date mb-2">{{ translation.Date | date:'short' }}, {{ translation.Provider.Name }}
-                    </div>
-
-                    <div>
-                        <strong>{{ translation.SourceLanguage.Name }}</strong>
-                    </div>
-                    <div class="mb-2">{{ translation.SourceText }}</div>
-
-                    <div>
-                        <strong>{{ translation.TargetLanguage.Name }}</strong>
-                    </div>
-                    <div class="mb-2">{{ translation.TranslatedText }}</div>
-
-                    <fluent-button appearance="outline" class="me-2"
-                        (click)="onLoadTranslation(translation); $event.stopPropagation()">Load</fluent-button>
-
-                    <fluent-button appearance="outline"
-                        (click)="deleteTranslation(translation.Id); $event.stopPropagation()">Delete</fluent-button>
-                </fluent-card>
-            </li>
-        </ul>
+      <ul class="translation-list">
+        @for (translation of translations; track translation) {
+          <li>
+            <fluent-card class="translation-item mb-3">
+              <div class="hs-date mb-2">{{ translation.Date | date:'short' }}, {{ translation.Provider.Name }}
+              </div>
+              <div>
+                <strong>{{ translation.SourceLanguage.Name }}</strong>
+              </div>
+              <div class="mb-2">{{ translation.SourceText }}</div>
+              <div>
+                <strong>{{ translation.TargetLanguage.Name }}</strong>
+              </div>
+              <div class="mb-2">{{ translation.TranslatedText }}</div>
+              <fluent-button appearance="outline" class="me-2"
+              (click)="onLoadTranslation(translation); $event.stopPropagation()">Load</fluent-button>
+              <fluent-button appearance="outline"
+              (click)="deleteTranslation(translation.Id); $event.stopPropagation()">Delete</fluent-button>
+            </fluent-card>
+          </li>
+        }
+      </ul>
     </div>
-
     <fluent-button appearance="neutral" (click)="clearTranslations()">Clear All History</fluent-button>
-</div>
+  </div>
+} @else {
+  <p>No translation history available.</p>
+}
 
-<ng-template #noHistory>
-    <p>No translation history available.</p>
-</ng-template>

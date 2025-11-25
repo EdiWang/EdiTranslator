@@ -3,15 +3,19 @@
     <h1>
       Edi's Translator
     </h1>
-    <small>v1.4.1000</small>
+    <small>v1.5.1000</small>
   </nav>
-  <fluent-progress indeterminate *ngIf="isBusy"></fluent-progress>
+  @if (isBusy) {
+    <fluent-progress indeterminate></fluent-progress>
+  }
 </header>
 
 <main class="container-fluid">
-  <div class="error-message mb-4" *ngIf="errorMessage">
-    {{ errorMessage }}
-  </div>
+  @if (errorMessage) {
+    <div class="error-message mb-4">
+      {{ errorMessage }}
+    </div>
+  }
   <div class="row">
     <div class="col-lg-9">
       <form class="form-source" [formGroup]="sourceForm" (ngSubmit)="onTranslate()">
@@ -20,19 +24,23 @@
             <section class="translator-text-container">
               <div class="d-flex lang-selector-bar">
                 <fluent-select title="Source language" formControlName="sourceLanguage" ngDefaultControl>
-                  <fluent-option *ngFor="let c of languageList" [value]="c.Code">{{ c.Name }}</fluent-option>
+                  @for (c of languageList; track c) {
+                    <fluent-option [value]="c.Code">{{ c.Name }}</fluent-option>
+                  }
                 </fluent-select>
 
                 <fluent-button type="button" appearance="light" (click)="swapLanguageSelector()">Swap</fluent-button>
 
                 <fluent-select title="Target language" formControlName="targetLanguage" ngDefaultControl>
-                  <fluent-option *ngFor="let c of languageList" [value]="c.Code">{{ c.Name }}</fluent-option>
+                  @for (c of languageList; track c) {
+                    <fluent-option [value]="c.Code">{{ c.Name }}</fluent-option>
+                  }
                 </fluent-select>
               </div>
               <div>
                 <fluent-text-area (keydown)="handleKeyDown($event)" class="source-text" formControlName="sourceText"
                   name="sourceText" ngDefaultControl placeholder="Enter text" maxlength="{{ maxTextLength }}" rows="10"
-                  spellcheck="false"></fluent-text-area>
+                spellcheck="false"></fluent-text-area>
               </div>
               <div class="char-count">
                 {{ sourceForm.get('sourceText')?.value?.length ?? 0 }} / {{ maxTextLength }} character(s)
@@ -40,7 +48,7 @@
             </section>
             <div class="mt-2">
               <fluent-button type="button" appearance="accent" class="me-2" [disabled]="!sourceForm.valid"
-                (click)="onTranslate()" title="CTRL + ENTER">Translate</fluent-button>
+              (click)="onTranslate()" title="CTRL + ENTER">Translate</fluent-button>
               <fluent-button type="button" appearance="light" (click)="clear()">Clear</fluent-button>
             </div>
             <div class="tips mt-3">
@@ -51,7 +59,9 @@
             <section class="translator-text-container">
               <div>
                 <fluent-select title="API" formControlName="apiProvider" ngDefaultControl>
-                  <fluent-option *ngFor="let p of providerList" [value]="p.ApiRoute">{{ p.Name }}</fluent-option>
+                  @for (p of providerList; track p) {
+                    <fluent-option [value]="p.ApiRoute">{{ p.Name }}</fluent-option>
+                  }
                 </fluent-select>
               </div>
               <div class="translated-text-container">
@@ -63,7 +73,7 @@
             </section>
             <div class="mt-2">
               <fluent-button type="button" appearance="accent" (click)="copyTranslatedText()"
-                [disabled]="translatedText.length == 0">Copy</fluent-button>
+              [disabled]="translatedText.length == 0">Copy</fluent-button>
             </div>
           </div>
         </div>

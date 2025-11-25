@@ -16,7 +16,7 @@ import { AppRoutingModule } from './app/app-routing.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ClipboardModule } from '@angular/cdk/clipboard';
 import { AppComponent } from './app/app.component';
-import { importProvidersFrom } from '@angular/core';
+import { importProvidersFrom, provideZoneChangeDetection } from '@angular/core';
 
 provideFluentDesignSystem().register(
   fluentCard(),
@@ -30,7 +30,7 @@ provideFluentDesignSystem().register(
 
 bootstrapApplication(AppComponent, {
     providers: [
-        importProvidersFrom(BrowserModule, AppRoutingModule, FormsModule, ReactiveFormsModule, ClipboardModule),
+        provideZoneChangeDetection(),importProvidersFrom(BrowserModule, AppRoutingModule, FormsModule, ReactiveFormsModule, ClipboardModule),
         { provide: HTTP_INTERCEPTORS, useClass: TranslatorApiInterceptor, multi: true },
         { provide: HTTP_INTERCEPTORS, useClass: RetryInterceptor, multi: true },
         provideHttpClient(withInterceptorsFromDi())
