@@ -71,7 +71,7 @@ export class AppComponent implements OnInit, OnDestroy {
     { Name: 'Azure Translator', ApiRoute: 'azure-translator' },
     { Name: 'GPT-4.1 (Azure)', ApiRoute: 'aoai/gpt-4.1' },
     { Name: 'GPT-4.1-mini (Azure)', ApiRoute: 'aoai/gpt-4.1-mini' },
-    { Name: 'GPT-4o (Azure)', ApiRoute: 'aoai/gpt-4o' },
+    { Name: 'GPT-5-mini (Azure)', ApiRoute: 'aoai/gpt-5-mini' },
   ];
 
   sourceForm!: FormGroup;
