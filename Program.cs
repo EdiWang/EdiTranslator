@@ -18,6 +18,7 @@ public class Program
         }
 
         builder.Services.AddControllers();
+        builder.Services.AddRazorPages();
         builder.Services.AddHttpClient();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
@@ -79,7 +80,6 @@ public class Program
 
         app.UseHttpsRedirection();
 
-        app.UseDefaultFiles();
         app.UseStaticFiles(new StaticFileOptions()
         {
             OnPrepareResponse = context =>
@@ -89,10 +89,12 @@ public class Program
             }
         });
 
+        app.UseRouting();
         app.UseAuthorization();
-
-        app.MapControllers();
         app.UseRateLimiter();
+
+        app.MapRazorPages();
+        app.MapControllers();
 
         app.Run();
     }
