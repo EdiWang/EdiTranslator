@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc.RazorPages;
+Ôªøusing Microsoft.AspNetCore.Mvc.RazorPages;
 using Edi.Translator.Models;
 
 namespace Edi.Translator.Pages;
@@ -7,11 +7,11 @@ public class IndexModel : PageModel
 {
     public const int MaxTextLength = 5000;
 
-    public static readonly LanguageChoice[] LanguageList = new[]
-    {
+    public static readonly LanguageChoice[] LanguageList =
+    [
         new LanguageChoice { Code = "auto-detect", Name = "Auto-Detect" },
-        new LanguageChoice { Code = "zh-Hans", Name = "ºÚÃÂ÷–Œƒ (Simplified Chinese)" },
-        new LanguageChoice { Code = "zh-Hant", Name = "∑±Ûw÷–Œƒ (Traditional Chinese)" },
+        new LanguageChoice { Code = "zh-Hans", Name = "ÁÆÄ‰Ωì‰∏≠Êñá (Simplified Chinese)" },
+        new LanguageChoice { Code = "zh-Hant", Name = "ÁπÅÈ´î‰∏≠Êñá (Traditional Chinese)" },
         new LanguageChoice { Code = "en-US", Name = "English (United States)" },
         new LanguageChoice { Code = "ar", Name = "??????? (Arabic)" },
         new LanguageChoice { Code = "de", Name = "Deutsch (German)" },
@@ -20,24 +20,24 @@ public class IndexModel : PageModel
         new LanguageChoice { Code = "hi", Name = "?????? (Hindi)" },
         new LanguageChoice { Code = "id", Name = "Bahasa Indonesia (Indonesian)" },
         new LanguageChoice { Code = "it", Name = "Italiano (Italian)" },
-        new LanguageChoice { Code = "ja", Name = "»’±æ’Z (Japanese)" },
+        new LanguageChoice { Code = "ja", Name = "Êó•Êú¨Ë™û (Japanese)" },
         new LanguageChoice { Code = "ko", Name = "??? (Korean)" },
         new LanguageChoice { Code = "nl", Name = "Nederlands (Dutch)" },
         new LanguageChoice { Code = "pl", Name = "Polski (Polish)" },
-        new LanguageChoice { Code = "pt", Name = "Portugu®∫s (Portuguese)" },
-        new LanguageChoice { Code = "ru", Name = "ß≤ßÂß„ß„ß‹ß⁄ß€ (Russian)" },
+        new LanguageChoice { Code = "pt", Name = "Portugu√™s (Portuguese)" },
+        new LanguageChoice { Code = "ru", Name = "–†—É—Å—Å–∫–∏–π (Russian)" },
         new LanguageChoice { Code = "th", Name = "??? (Thai)" },
-        new LanguageChoice { Code = "tr", Name = "T®πrk?e (Turkish)" },
+        new LanguageChoice { Code = "tr", Name = "T√ºrk?e (Turkish)" },
         new LanguageChoice { Code = "vi", Name = "Ti?ng Vi?t (Vietnamese)" }
-    };
+    ];
 
-    public static readonly ApiProvider[] ProviderList = new[]
-    {
+    public static readonly ApiProvider[] ProviderList =
+    [
         new ApiProvider { Name = "Azure Translator", ApiRoute = "azure-translator" },
         new ApiProvider { Name = "GPT-4.1 (Azure)", ApiRoute = "aoai/gpt-4.1" },
         new ApiProvider { Name = "GPT-4.1-mini (Azure)", ApiRoute = "aoai/gpt-4.1-mini" },
         new ApiProvider { Name = "GPT-5-mini (Azure)", ApiRoute = "aoai/gpt-5-mini" }
-    };
+    ];
 
     public void OnGet()
     {
