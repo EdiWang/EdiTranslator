@@ -1,0 +1,208 @@
+/* Reset and Base Styles */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Header Styles */
+header {
+    align-items: center;
+    height: 60px;
+}
+
+header nav {
+    display: flex;
+    padding: 12px 20px;
+    justify-content: space-between;
+    border-bottom: 1px solid #ccc;
+}
+
+header nav small {
+    align-self: center;
+}
+
+header h1 {
+    align-self: center;
+    font-size: 24px;
+    margin: 0 !important;
+}
+
+/* Main Layout */
+.container-fluid {
+    padding: 20px;
+}
+
+/* Bootstrap-like utilities */
+.mb-2 {
+    margin-bottom: 0.5rem;
+}
+
+.mb-3 {
+    margin-bottom: 1rem;
+}
+
+.mb-4 {
+    margin-bottom: 1.5rem;
+}
+
+.mt-2 {
+    margin-top: 0.5rem;
+}
+
+.mt-3 {
+    margin-top: 1rem;
+}
+
+.me-2 {
+    margin-right: 0.5rem;
+}
+
+.d-flex {
+    display: flex;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -15px;
+    margin-left: -15px;
+}
+
+.col-lg-3, .col-lg-6, .col-lg-9, .col-md-12 {
+    position: relative;
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+}
+
+.col-md-12 {
+    flex: 0 0 100%;
+    max-width: 100%;
+}
+
+@media (min-width: 992px) {
+    .col-lg-3 {
+        flex: 0 0 25%;
+        max-width: 25%;
+    }
+
+    .col-lg-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+
+    .col-lg-9 {
+        flex: 0 0 75%;
+        max-width: 75%;
+    }
+}
+
+/* Translator Specific Styles */
+section.translator-text-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.lang-selector-bar {
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.source-text {
+    font-size: 16px;
+    line-height: 25px;
+}
+
+.translated-text-container {
+    background-color: #F2F2F2;
+    min-height: 264px;
+    max-height: calc(100vh - 200px);
+    border-radius: 4px;
+    padding: 8px;
+    font-size: 16px;
+    line-height: 25px;
+    white-space: pre-line;
+    overflow-y: auto;
+}
+
+.tips {
+    font-size: 12px;
+    color: #666;
+}
+
+.char-count {
+    font-size: 12px;
+    color: #666;
+}
+
+fluent-text-area {
+    width: 100%;
+}
+
+.error-message {
+    background-color: rgb(248, 215, 218);
+    border-radius: 6px;
+    border: 1px solid rgb(241, 174, 181);
+    padding: 12px;
+    color: rgb(88, 21, 28);
+    font-size: 14px;
+}
+
+/* Translation History Styles */
+.translation-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.history-container {
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}
+
+.translation-item {
+    padding: 10px;
+    transition: background-color 0.3s;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.translation-item:hover {
+    background-color: #f9f9f9;
+}
+
+.hs-date {
+    font-size: 12px;
+    color: #666;
+}
+
+/* Footer */
+footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #666;
+    font-size: 14px;
+    margin-top: 70px;
+    padding: 20px;
+}
+
+footer p {
+    margin: 0;
+}
+
+/* Fluent UI Overrides */
+fluent-select,
+fluent-button,
+fluent-text-area,
+fluent-card,
+fluent-progress {
+    --accent-fill-rest: #0078d4;
+}
