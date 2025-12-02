@@ -1,0 +1,92 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Translator";
+}
+
+<div id="error-container" class="error-message mb-4" style="display: none;"></div>
+
+<div class="row">
+    <div class="col-lg-9">
+        <form id="translatorForm">
+            <div class="row">
+                <div class="col-md-12 col-lg-6">
+                    <section class="translator-text-container">
+                        <div class="d-flex lang-selector-bar">
+                            <fluent-select id="sourceLanguage" title="Source language">
+                                @foreach (var lang in IndexModel.LanguageList)
+                                {
+                                    <fluent-option value="@lang.Code">@lang.Name</fluent-option>
+                                }
+                            </fluent-select>
+
+                            <fluent-button type="button" appearance="light" id="swapLanguages">Swap</fluent-button>
+
+                            <fluent-select id="targetLanguage" title="Target language">
+                                @foreach (var lang in IndexModel.LanguageList)
+                                {
+                                    <fluent-option value="@lang.Code">@lang.Name</fluent-option>
+                                }
+                            </fluent-select>
+                        </div>
+                        <div>
+                            <fluent-text-area 
+                                id="sourceText" 
+                                class="source-text" 
+                                placeholder="Enter text" 
+                                maxlength="@IndexModel.MaxTextLength" 
+                                rows="10"
+                                spellcheck="false">
+                            </fluent-text-area>
+                        </div>
+                        <div class="char-count">
+                            <span id="charCount">0</span> / @IndexModel.MaxTextLength character(s)
+                        </div>
+                    </section>
+                    <div class="mt-2">
+                        <fluent-button type="button" appearance="accent" class="me-2" id="translateBtn" title="CTRL + ENTER">
+                            Translate
+                        </fluent-button>
+                        <fluent-button type="button" appearance="light" id="clearBtn">Clear</fluent-button>
+                    </div>
+                    <div class="tips mt-3">
+                        <span>Tip: Press CTRL + Enter to submit the form.</span>
+                    </div>
+                </div>
+                <div class="col-md-12 col-lg-6">
+                    <section class="translator-text-container">
+                        <div>
+                            <fluent-select id="apiProvider" title="API">
+                                @foreach (var provider in IndexModel.ProviderList)
+                                {
+                                    <fluent-option value="@provider.ApiRoute">@provider.Name</fluent-option>
+                                }
+                            </fluent-select>
+                        </div>
+                        <div class="translated-text-container" id="translatedText"></div>
+                        <div class="char-count">
+                            <span id="translatedCharCount">0</span> character(s)
+                        </div>
+                    </section>
+                    <div class="mt-2">
+                        <fluent-button type="button" appearance="accent" id="copyBtn" disabled>
+                            Copy
+                        </fluent-button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="col-lg-3">
+        <h3>History</h3>
+        <div id="translationHistory"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Language and provider lists for JavaScript
+        window.languageList = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(IndexModel.LanguageList));
+        window.providerList = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(IndexModel.ProviderList));
+    </script>
+}

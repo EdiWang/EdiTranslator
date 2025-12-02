@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Edi's Translator</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@@fluentui/web-components/dist/web-components.min.js"></script>
+</head>
+<body>
+    <header class="mb-4">
+        <nav>
+            <h1>Edi's Translator</h1>
+            <small>v2.0.0</small>
+        </nav>
+        <div id="progress-container" style="display: none;">
+            <fluent-progress indeterminate></fluent-progress>
+        </div>
+    </header>
+
+    <main class="container-fluid">
+        @RenderBody()
+    </main>
+
+    <footer>
+        <p>&copy; @DateTime.Now.Year - Edi's Translator</p>
+    </footer>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
