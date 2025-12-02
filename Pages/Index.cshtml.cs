@@ -13,22 +13,22 @@ public class IndexModel : PageModel
         new LanguageChoice { Code = "zh-Hans", Name = "简体中文 (Simplified Chinese)" },
         new LanguageChoice { Code = "zh-Hant", Name = "繁體中文 (Traditional Chinese)" },
         new LanguageChoice { Code = "en-US", Name = "English (United States)" },
-        new LanguageChoice { Code = "ar", Name = "??????? (Arabic)" },
+        new LanguageChoice { Code = "ar", Name = "العربية (Arabic)" },
         new LanguageChoice { Code = "de", Name = "Deutsch (German)" },
-        new LanguageChoice { Code = "es", Name = "Espa?ol (Spanish)" },
-        new LanguageChoice { Code = "fr", Name = "Fran?ais (French)" },
-        new LanguageChoice { Code = "hi", Name = "?????? (Hindi)" },
+        new LanguageChoice { Code = "es", Name = "Español (Spanish)" },
+        new LanguageChoice { Code = "fr", Name = "Français (French)" },
+        new LanguageChoice { Code = "hi", Name = "हिन्दी (Hindi)" },
         new LanguageChoice { Code = "id", Name = "Bahasa Indonesia (Indonesian)" },
         new LanguageChoice { Code = "it", Name = "Italiano (Italian)" },
         new LanguageChoice { Code = "ja", Name = "日本語 (Japanese)" },
-        new LanguageChoice { Code = "ko", Name = "??? (Korean)" },
+        new LanguageChoice { Code = "ko", Name = "한국어 (Korean)" },
         new LanguageChoice { Code = "nl", Name = "Nederlands (Dutch)" },
         new LanguageChoice { Code = "pl", Name = "Polski (Polish)" },
         new LanguageChoice { Code = "pt", Name = "Português (Portuguese)" },
         new LanguageChoice { Code = "ru", Name = "Русский (Russian)" },
-        new LanguageChoice { Code = "th", Name = "??? (Thai)" },
-        new LanguageChoice { Code = "tr", Name = "Türk?e (Turkish)" },
-        new LanguageChoice { Code = "vi", Name = "Ti?ng Vi?t (Vietnamese)" }
+        new LanguageChoice { Code = "th", Name = "ไทย (Thai)" },
+        new LanguageChoice { Code = "tr", Name = "Türkçe (Turkish)" },
+        new LanguageChoice { Code = "vi", Name = "Tiếng Việt (Vietnamese)" }
     ];
 
     public static readonly ApiProvider[] ProviderList =
