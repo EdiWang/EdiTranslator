@@ -68,5 +68,5 @@ See `Development` section for setup the project. Then use `Release` configuratio
 ## Tech Stack
 
 - AI: Azure Translator API, Azure Open AI
-- Frontend: Angular
-- Backend: ASP.NET Core
+- Frontend: ASP.NET Core Razor Page
+- Backend: ASP.NET Core Web API
