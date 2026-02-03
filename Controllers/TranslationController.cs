@@ -94,9 +94,9 @@ public class TranslationController(
         }
     }
 
-    [HttpPost("aoai/{deploymentName}")]
+    [HttpPost("ai/{deploymentName}")]
     [EnableRateLimiting("TranslateLimiter")]
-    public async Task<IActionResult> TranslateByOpenAI(
+    public async Task<IActionResult> TranslateByAzureAI(
         [FromBody] TranslationRequest request,
         [FromRoute] string deploymentName,
         CancellationToken cancellationToken = default)

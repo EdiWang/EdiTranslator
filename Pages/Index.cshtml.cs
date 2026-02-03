@@ -34,9 +34,9 @@ public class IndexModel : PageModel
     public static readonly ApiProvider[] ProviderList =
     [
         new ApiProvider { Name = "Azure Translator", ApiRoute = "azure-translator" },
-        new ApiProvider { Name = "GPT-4.1 (Azure)", ApiRoute = "aoai/gpt-4.1" },
-        new ApiProvider { Name = "GPT-4.1-mini (Azure)", ApiRoute = "aoai/gpt-4.1-mini" },
-        new ApiProvider { Name = "GPT-5-mini (Azure)", ApiRoute = "aoai/gpt-5-mini" }
+        new ApiProvider { Name = "GPT-4.1 (Azure)", ApiRoute = "ai/gpt-4.1" },
+        new ApiProvider { Name = "GPT-4.1-mini (Azure)", ApiRoute = "ai/gpt-4.1-mini" },
+        new ApiProvider { Name = "GPT-5-mini (Azure)", ApiRoute = "ai/gpt-5-mini" }
     ];
 
     public void OnGet()
