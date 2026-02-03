@@ -23,7 +23,6 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
         builder.Services.AddApplicationInsightsTelemetry();
-        builder.Services.Configure<AzureOpenAIOptions>(builder.Configuration.GetSection(AzureOpenAIOptions.SectionName));
         builder.Services.AddScoped<IAOAIClient, AOAIClient>();
 
         builder.Services.Configure<RouteOptions>(options =>
@@ -58,15 +57,13 @@ public class Program
 
         builder.Services.Configure<AzureTranslatorConfig>(
             builder.Configuration.GetSection(AzureTranslatorConfig.SectionName));
-        builder.Services.Configure<AzureOpenAIConfig>(
-            builder.Configuration.GetSection(AzureOpenAIConfig.SectionName));
 
         builder.Services.AddOptions<AzureTranslatorConfig>()
             .BindConfiguration(AzureTranslatorConfig.SectionName)
             .ValidateDataAnnotations()
             .ValidateOnStart();
-        builder.Services.AddOptions<AzureOpenAIConfig>()
-            .BindConfiguration(AzureOpenAIConfig.SectionName)
+        builder.Services.AddOptions<AzureOpenAIOptions>()
+            .BindConfiguration(AzureOpenAIOptions.SectionName)
             .ValidateDataAnnotations()
             .ValidateOnStart();
 

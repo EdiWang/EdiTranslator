@@ -16,7 +16,13 @@ public class AzureOpenAIOptions
 
     public required string Endpoint { get; init; }
     public required string Key { get; init; }
-    public string[] DeploymentNames { get; init; } = [];
+    public AzureOpenAIDeploymentOption[] Deployments { get; init; } = [];
+}
+
+public class AzureOpenAIDeploymentOption
+{
+    public required string Name { get; init; }
+    public required string DisplayName { get; init; }
 }
 
 public class AOAIClient : IAOAIClient
@@ -90,7 +96,8 @@ public class AOAIClient : IAOAIClient
 
     private bool IsValidDeployment(string deploymentName)
     {
-        return _options.DeploymentNames.Length == 0 || _options.DeploymentNames.Contains(deploymentName);
+        return _options.Deployments.Length == 0 || 
+               _options.Deployments.Any(d => d.Name.Equals(deploymentName, StringComparison.OrdinalIgnoreCase));
     }
 
     private static void ValidateConfiguration(AzureOpenAIOptions options)

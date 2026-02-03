@@ -12,13 +12,13 @@ namespace Edi.Translator.Controllers;
 [Route("api/[controller]")]
 public class TranslationController(
     IOptions<AzureTranslatorConfig> translatorConfig,
-    IOptions<AzureOpenAIConfig> openAIConfig,
+    IOptions<AzureOpenAIOptions> openAIOptions,
     ILogger<TranslationController> logger,
     IAOAIClient aoaiClient)
     : ControllerBase
 {
     private readonly AzureTranslatorConfig _translatorConfig = translatorConfig.Value;
-    private readonly AzureOpenAIConfig _openAIConfig = openAIConfig.Value;
+    private readonly AzureOpenAIOptions _openAIOptions = openAIOptions.Value;
 
     [HttpPost("azure-translator")]
     [EnableRateLimiting("TranslateLimiter")]
@@ -166,7 +166,7 @@ public class TranslationController(
             return false;
         }
 
-        var deploymentNames = _openAIConfig.DeploymentNames;
-        return deploymentNames?.Contains(deploymentName, StringComparer.OrdinalIgnoreCase) == true;
+        return _openAIOptions.Deployments?.Any(d => 
+            d.Name.Equals(deploymentName, StringComparison.OrdinalIgnoreCase)) == true;
     }
 }

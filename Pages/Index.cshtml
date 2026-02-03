@@ -57,7 +57,7 @@
                     <section class="translator-text-container">
                         <div>
                             <fluent-select id="apiProvider" title="API">
-                                @foreach (var provider in IndexModel.ProviderList)
+                                @foreach (var provider in Model.ProviderList)
                                 {
                                     <fluent-option value="@provider.ApiRoute">@provider.Name</fluent-option>
                                 }
@@ -87,6 +87,6 @@
     <script>
         // Language and provider lists for JavaScript
         window.languageList = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(IndexModel.LanguageList));
-        window.providerList = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(IndexModel.ProviderList));
+        window.providerList = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ProviderList));
     </script>
 }

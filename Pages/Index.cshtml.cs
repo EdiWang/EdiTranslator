@@ -1,10 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Options;
 using Edi.Translator.Models;
+using Edi.Translator.Providers.AzureOpenAI;
 
 namespace Edi.Translator.Pages;
 
-public class IndexModel : PageModel
+public class IndexModel(IOptions<AzureOpenAIOptions> openAIOptions) : PageModel
 {
+    private readonly AzureOpenAIOptions _openAIOptions = openAIOptions.Value;
+
     public const int MaxTextLength = 5000;
 
     public static readonly LanguageChoice[] LanguageList =
@@ -31,13 +35,28 @@ public class IndexModel : PageModel
         new LanguageChoice { Code = "vi", Name = "Tiếng Việt (Vietnamese)" }
     ];
 
-    public static readonly ApiProvider[] ProviderList =
-    [
-        new ApiProvider { Name = "Azure Translator", ApiRoute = "azure-translator" },
-        new ApiProvider { Name = "GPT-4.1 (Azure)", ApiRoute = "ai/gpt-4.1" },
-        new ApiProvider { Name = "GPT-4.1-mini (Azure)", ApiRoute = "ai/gpt-4.1-mini" },
-        new ApiProvider { Name = "GPT-5-mini (Azure)", ApiRoute = "ai/gpt-5-mini" }
-    ];
+    public ApiProvider[] ProviderList
+    {
+        get
+        {
+            var providers = new List<ApiProvider>
+            {
+                new ApiProvider { Name = "Azure Translator", ApiRoute = "azure-translator" }
+            };
+
+            if (_openAIOptions.Deployments != null)
+            {
+                providers.AddRange(_openAIOptions.Deployments.Select(d =>
+                    new ApiProvider
+                    {
+                        Name = d.DisplayName,
+                        ApiRoute = $"ai/{d.Name}"
+                    }));
+            }
+
+            return providers.ToArray();
+        }
+    }
 
     public void OnGet()
     {
