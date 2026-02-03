@@ -10,7 +10,7 @@ A simple Web UI that uses the Azure Translator API and Azure Open AI to translat
 - Save translation history
 - API Providers
   - Azure Translator (Text)
-  - Azure Open AI (GPT-4o and GPT-3.5 Turbo)
+  - Azure Open AI
 
 ## How to Run
 
@@ -44,7 +44,7 @@ See `Development` section for setup the project. Then use `Release` configuratio
 
 0. Create an Azure Translator instace and get the API key and region
 1. Create an Azure Open AI instance
-  - Deploy both GPT-4o and GPT 3.5 Turbo model with deployment name as `gpt-4o` and `gpt-35-turbo`
+  - Deploy chat completion models like `gpt-4.1`
   - Get the API key and endpoint
 2. Open the solution in Visual Studio
 3. Modify `appsettings.json` or create `appsettings.Development.json` and set your API key and region like this
@@ -59,8 +59,41 @@ See `Development` section for setup the project. Then use `Release` configuratio
   "AzureOpenAI": {
     "Endpoint": "https://<your_instance>.openai.azure.com/",
     "Key": "YOUR_AZURE_OPENAI_KEY",
+    "Deployments": [
+      {
+        "Name": "gpt-4.1",
+        "DisplayName": "GPT-4.1 (Azure)",
+        "Enabled": true
+      },
+      {
+        "Name": "gpt-4.1-mini",
+        "DisplayName": "GPT-4.1-mini (Azure)",
+        "Enabled": false
+      },
+      {
+        "Name": "gpt-5-mini",
+        "DisplayName": "GPT-5-mini (Azure)",
+        "Enabled": true
+      },
+      {
+        "Name": "gpt-5.1-chat",
+        "DisplayName": "GPT-5.1-chat (Azure)",
+        "Enabled": true
+      },
+      {
+        "Name": "gpt-5.2-chat",
+        "DisplayName": "GPT-5.2-chat (Azure)",
+        "Enabled": true
+      },
+      {
+        "Name": "DeepSeek-V3.2",
+        "DisplayName": "DeepSeek-V3.2 (Azure)",
+        "Enabled": true
+      }
+    ]
   }
 }
+
 ```
 
 4. Run the project
