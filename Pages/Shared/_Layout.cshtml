@@ -1,3 +1,7 @@
+@{
+    var version = System.Reflection.Assembly.GetEntryAssembly()?.GetName().Version?.ToString() ?? "unknown";
+}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,7 +15,7 @@
     <header class="mb-4">
         <nav>
             <h1>Edi's Translator</h1>
-            <small>v2.0.0</small>
+            <small>@version</small>
         </nav>
         <div id="progress-container" style="display: none;">
             <fluent-progress indeterminate></fluent-progress>

@@ -107,10 +107,17 @@ public class TranslationController(
         }
 
         // Validate deployment name
-        if (!IsValidDeploymentName(deploymentName))
+        var deployment = GetDeployment(deploymentName);
+        if (deployment == null)
         {
             logger.LogWarning("Invalid deployment name requested: {DeploymentName}", deploymentName);
             return BadRequest($"Invalid deployment name: {deploymentName}");
+        }
+
+        if (!deployment.Enabled)
+        {
+            logger.LogWarning("Deployment disabled: {DeploymentName}", deploymentName);
+            return StatusCode(StatusCodes.Status403Forbidden, $"Deployment disabled: {deploymentName}");
         }
 
         try
@@ -159,14 +166,14 @@ public class TranslationController(
         return null;
     }
 
-    private bool IsValidDeploymentName(string deploymentName)
+    private AzureOpenAIDeploymentOption GetDeployment(string deploymentName)
     {
         if (string.IsNullOrWhiteSpace(deploymentName))
         {
-            return false;
+            return null;
         }
 
-        return _openAIOptions.Deployments?.Any(d => 
-            d.Name.Equals(deploymentName, StringComparison.OrdinalIgnoreCase)) == true;
+        return _openAIOptions.Deployments?
+            .FirstOrDefault(d => d.Name.Equals(deploymentName, StringComparison.OrdinalIgnoreCase));
     }
 }

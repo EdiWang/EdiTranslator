@@ -46,8 +46,9 @@ public class IndexModel(IOptions<AzureOpenAIOptions> openAIOptions) : PageModel
 
             if (_openAIOptions.Deployments != null)
             {
-                providers.AddRange(_openAIOptions.Deployments.Select(d =>
-                    new ApiProvider
+                providers.AddRange(_openAIOptions.Deployments
+                    .Where(d => d.Enabled)
+                    .Select(d => new ApiProvider
                     {
                         Name = d.DisplayName,
                         ApiRoute = $"ai/{d.Name}"
