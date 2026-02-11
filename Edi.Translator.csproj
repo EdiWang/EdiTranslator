@@ -7,14 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.ApplicationInsights" Version="2.23.0" />
-        <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.23.0" />
-        <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="10.0.2" />
+        <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="10.0.3" />
 
         <PackageReference Include="Azure.AI.Translation.Text" Version="1.0.0" />
         <PackageReference Include="Azure.AI.OpenAI" Version="2.1.0" />
 
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.1" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.2" />
     </ItemGroup>
 
 </Project>
