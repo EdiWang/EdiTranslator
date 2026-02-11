@@ -122,7 +122,7 @@ public class TranslationController(
 
         try
         {
-            var aoiResult = await aoaiClient.TranslateAsync(
+            var translatedText = await aoaiClient.TranslateAsync(
                 request.FromLang,
                 request.ToLang,
                 request.Content,
@@ -132,7 +132,7 @@ public class TranslationController(
             var result = new TranslationResult
             {
                 ProviderCode = "aoai",
-                TranslatedText = aoiResult.Text
+                TranslatedText = translatedText
             };
 
             logger.LogInformation("Successfully translated text using Azure OpenAI. Deployment: {DeploymentName}, From: {FromLang}, To: {ToLang}",

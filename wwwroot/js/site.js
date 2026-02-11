@@ -210,7 +210,8 @@ class TranslatorApp {
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                const errorText = await response.text();
+                throw new Error(errorText || `HTTP error! status: ${response.status}`);
             }
 
             const data = await response.json();
@@ -236,7 +237,7 @@ class TranslatorApp {
 
         } catch (error) {
             console.error('Translation error:', error);
-            this.showError('An error occurred while translating the text. Please try again.');
+            this.showError(error.message || 'An error occurred while translating the text. Please try again.');
         } finally {
             this.hideProgress();
         }
@@ -255,7 +256,11 @@ class TranslatorApp {
         const text = this.translatedText.textContent;
         if (text) {
             navigator.clipboard.writeText(text).then(() => {
-                console.log('Text copied to clipboard');
+                const originalText = this.copyBtn.textContent;
+                this.copyBtn.textContent = 'Copied!';
+                setTimeout(() => {
+                    this.copyBtn.textContent = originalText;
+                }, 2000);
             }).catch(err => {
                 console.error('Failed to copy text:', err);
             });
@@ -273,6 +278,16 @@ class TranslatorApp {
 
         this.sourceLanguage.value = currentTarget;
         this.targetLanguage.value = currentSource;
+
+        // Also swap the text content
+        const currentTranslated = this.translatedText.textContent;
+        if (currentTranslated) {
+            this.sourceText.value = currentTranslated;
+            this.translatedText.textContent = '';
+            this.charCount.textContent = currentTranslated.length;
+            this.translatedCharCount.textContent = '0';
+            this.copyBtn.disabled = true;
+        }
     }
 
     renderHistory() {
@@ -292,9 +307,9 @@ class TranslatorApp {
                     <fluent-card class="translation-item mb-3">
                         <div class="hs-date mb-2">${date}, ${translation.Provider.Name}</div>
                         <div><strong>${translation.SourceLanguage.Name}</strong></div>
-                        <div class="mb-2">${this.escapeHtml(translation.SourceText)}</div>
+                        <div class="mb-2">${this.escapeHtml(this.truncateText(translation.SourceText))}</div>
                         <div><strong>${translation.TargetLanguage.Name}</strong></div>
-                        <div class="mb-2">${this.escapeHtml(translation.TranslatedText)}</div>
+                        <div class="mb-2">${this.escapeHtml(this.truncateText(translation.TranslatedText))}</div>
                         <fluent-button appearance="outline" class="me-2" onclick="app.loadTranslation(${translation.Id})">Load</fluent-button>
                         <fluent-button appearance="outline" onclick="app.deleteTranslation(${translation.Id})">Delete</fluent-button>
                     </fluent-card>
@@ -344,6 +359,11 @@ class TranslatorApp {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    truncateText(text, maxLength = 100) {
+        if (text.length <= maxLength) return text;
+        return text.substring(0, maxLength) + '…';
     }
 
     startKeepAlive() {

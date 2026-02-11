@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Options;
-using Edi.Translator.Models;
+﻿using Edi.Translator.Models;
 using Edi.Translator.Providers.AzureOpenAI;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Options;
 
 namespace Edi.Translator.Pages;
 

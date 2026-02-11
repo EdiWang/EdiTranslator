@@ -1,6 +1,6 @@
 ﻿namespace Edi.Translator;
 
-public class Helper
+public static class Helper
 {
     public static bool IsRunningOnAzureAppService()
     {

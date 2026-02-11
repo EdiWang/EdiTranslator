@@ -1,4 +1,4 @@
-@page
+﻿@page
 @model IndexModel
 @{
     ViewData["Title"] = "Translator";
@@ -23,7 +23,7 @@
                             <fluent-button type="button" appearance="light" id="swapLanguages">Swap</fluent-button>
 
                             <fluent-select id="targetLanguage" title="Target language">
-                                @foreach (var lang in IndexModel.LanguageList)
+                                @foreach (var lang in IndexModel.LanguageList.Where(l => l.Code != "auto-detect"))
                                 {
                                     <fluent-option value="@lang.Code">@lang.Name</fluent-option>
                                 }

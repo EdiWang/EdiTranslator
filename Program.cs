@@ -19,10 +19,8 @@ public class Program
 
         builder.Services.AddControllers();
         builder.Services.AddRazorPages();
-        builder.Services.AddHttpClient();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
-        builder.Services.AddApplicationInsightsTelemetry();
         builder.Services.AddScoped<IAOAIClient, AOAIClient>();
 
         builder.Services.Configure<RouteOptions>(options =>
@@ -54,9 +52,6 @@ public class Program
 
             AddLimiter("TranslateLimiter", 5, TimeSpan.FromSeconds(1));
         });
-
-        builder.Services.Configure<AzureTranslatorConfig>(
-            builder.Configuration.GetSection(AzureTranslatorConfig.SectionName));
 
         builder.Services.AddOptions<AzureTranslatorConfig>()
             .BindConfiguration(AzureTranslatorConfig.SectionName)

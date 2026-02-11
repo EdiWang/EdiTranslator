@@ -7,7 +7,7 @@ namespace Edi.Translator.Providers.AzureOpenAI;
 
 public interface IAOAIClient
 {
-    Task<ChatMessageContentPart> TranslateAsync(string fromLang, string toLang, string content, string deploymentName, CancellationToken cancellationToken = default);
+    Task<string> TranslateAsync(string? fromLang, string toLang, string content, string deploymentName, CancellationToken cancellationToken = default);
 }
 
 public class AzureOpenAIOptions
@@ -51,14 +51,13 @@ public class AOAIClient : IAOAIClient
         _azureClient = new AzureOpenAIClient(new Uri(_options.Endpoint), new ApiKeyCredential(_options.Key));
     }
 
-    public async Task<ChatMessageContentPart> TranslateAsync(
-        string fromLang,
+    public async Task<string> TranslateAsync(
+        string? fromLang,
         string toLang,
         string content,
         string deploymentName,
         CancellationToken cancellationToken = default)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(fromLang);
         ArgumentException.ThrowIfNullOrWhiteSpace(toLang);
         ArgumentException.ThrowIfNullOrWhiteSpace(content);
         ArgumentException.ThrowIfNullOrWhiteSpace(deploymentName);
@@ -73,7 +72,12 @@ public class AOAIClient : IAOAIClient
             var chatClient = _azureClient.GetChatClient(deploymentName);
 
             var systemMessage = new SystemChatMessage(SystemPrompt);
-            var userMessage = new UserChatMessage($"Translate the following text from {fromLang} to {toLang}: {content}");
+
+            var prompt = string.IsNullOrWhiteSpace(fromLang)
+                ? $"Auto-detect the source language and translate the following text to {toLang}: {content}"
+                : $"Translate the following text from {fromLang} to {toLang}: {content}";
+
+            var userMessage = new UserChatMessage(prompt);
 
             var response = await chatClient.CompleteChatAsync(
                 [systemMessage, userMessage],
@@ -81,12 +85,13 @@ public class AOAIClient : IAOAIClient
 
             var firstContent = response?.Value?.Content?.FirstOrDefault();
 
-            if (firstContent == null)
+            if (firstContent is null)
             {
                 _logger.LogWarning("Received empty response from Azure OpenAI for deployment {DeploymentName}", deploymentName);
+                return string.Empty;
             }
 
-            return firstContent;
+            return firstContent.Text;
         }
         catch (Exception ex)
         {
