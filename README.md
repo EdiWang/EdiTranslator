@@ -1,6 +1,6 @@
 # Edi's Translator
 
-A simple Web UI that uses the Azure Translator API and Azure Open AI to translate text from one language to another. 
+A simple Web UI that uses the Azure Translator API and Microsoft Foundry to translate text from one language to another. 
 
 ![image](https://github.com/EdiWang/EdiTranslator/assets/3304703/a29edb4e-8d61-4db6-9c85-e1e7c7ecab8e)
 
@@ -10,7 +10,7 @@ A simple Web UI that uses the Azure Translator API and Azure Open AI to translat
 - Save translation history
 - API Providers
   - Azure Translator (Text)
-  - Azure Open AI
+  - Microsoft Foundry (Chat Completion)
 
 ## How to Run
 
@@ -22,16 +22,16 @@ A simple Web UI that uses the Azure Translator API and Azure Open AI to translat
 docker run -d -p 8080:8080 -e AzureTranslator__Key=********* -e AzureTranslator__Region==********* ediwang/editranslator
 ```
 
-#### Azure Open AI only
+#### Microsoft Foundry only
 
 ```bash
-docker run -d -p 8080:8080 -e -AzureOpenAI__Endpoint=****** -e AzureOpenAI__Key=********* ediwang/editranslator
+docker run -d -p 8080:8080 -e -MicrosoftFoundry__Endpoint=****** -e MicrosoftFoundry__Key=********* ediwang/editranslator
 ```
 
 #### Both
 
 ```bash
-docker run -d -p 8080:8080 -e AzureTranslator__Key=********* -e AzureTranslator__Region==********* -e AzureOpenAI__Endpoint=****** -e AzureOpenAI__Key=********* ediwang/editranslator
+docker run -d -p 8080:8080 -e AzureTranslator__Key=********* -e AzureTranslator__Region==********* -e MicrosoftFoundry__Endpoint=****** -e MicrosoftFoundry__Key=********* ediwang/editranslator
 ```
 
 ### Code Deployment
@@ -43,8 +43,8 @@ See `Development` section for setup the project. Then use `Release` configuratio
 ## Development
 
 0. Create an Azure Translator instace and get the API key and region
-1. Create an Azure Open AI instance
-  - Deploy chat completion models like `gpt-4.1`
+1. Create an Microsoft Foundry project
+  - Deploy chat completion models like `gpt-5.4`
   - Get the API key and endpoint
 2. Open the solution in Visual Studio
 3. Modify `appsettings.json` or create `appsettings.Development.json` and set your API key and region like this
@@ -56,7 +56,7 @@ See `Development` section for setup the project. Then use `Release` configuratio
     "Key": "YOUR_AZURE_TRANSLATOR_KEY",
     "Region": "YOUR_AZURE_TRANSLATOR_REGION"
   },
-  "AzureOpenAI": {
+  "MicrosoftFoundry": {
     "Endpoint": "https://<your_instance>.openai.azure.com/",
     "Key": "YOUR_AZURE_OPENAI_KEY",
     "Deployments": [
@@ -66,23 +66,8 @@ See `Development` section for setup the project. Then use `Release` configuratio
         "Enabled": true
       },
       {
-        "Name": "gpt-4.1-mini",
-        "DisplayName": "GPT-4.1-mini (Azure)",
-        "Enabled": false
-      },
-      {
-        "Name": "gpt-5-mini",
-        "DisplayName": "GPT-5-mini (Azure)",
-        "Enabled": true
-      },
-      {
-        "Name": "gpt-5.1-chat",
-        "DisplayName": "GPT-5.1-chat (Azure)",
-        "Enabled": true
-      },
-      {
-        "Name": "gpt-5.2-chat",
-        "DisplayName": "GPT-5.2-chat (Azure)",
+        "Name": "gpt-5.4",
+        "DisplayName": "GPT-5.4 (Azure)",
         "Enabled": true
       },
       {
@@ -100,6 +85,6 @@ See `Development` section for setup the project. Then use `Release` configuratio
 
 ## Tech Stack
 
-- AI: Azure Translator API, Azure Open AI
+- AI: Azure Translator API, Microsoft Foundry
 - Frontend: ASP.NET Core Razor Page
 - Backend: ASP.NET Core Web API
