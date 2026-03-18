@@ -20,7 +20,6 @@ public class Program
         builder.Services.AddControllers();
         builder.Services.AddRazorPages();
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
         builder.Services.AddScoped<IAOAIClient, AOAIClient>();
 
         builder.Services.Configure<RouteOptions>(options =>
@@ -63,12 +62,6 @@ public class Program
             .ValidateOnStart();
 
         var app = builder.Build();
-
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI();
-        }
 
         app.UseHttpsRedirection();
 
