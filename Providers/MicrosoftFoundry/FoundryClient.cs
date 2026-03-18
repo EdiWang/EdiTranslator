@@ -1,36 +1,36 @@
-﻿using Azure.AI.OpenAI;
+using Azure.AI.OpenAI;
 using Microsoft.Extensions.Options;
 using OpenAI.Chat;
 using System.ClientModel;
 
-namespace Edi.Translator.Providers.AzureOpenAI;
+namespace Edi.Translator.Providers.MicrosoftFoundry;
 
-public interface IAOAIClient
+public interface IFoundryClient
 {
     Task<string> TranslateAsync(string? fromLang, string toLang, string content, string deploymentName, CancellationToken cancellationToken = default);
 }
 
-public class AzureOpenAIOptions
+public class MicrosoftFoundryOptions
 {
-    public const string SectionName = "AzureOpenAI";
+    public const string SectionName = "MicrosoftFoundry";
 
     public required string Endpoint { get; init; }
     public required string Key { get; init; }
-    public AzureOpenAIDeploymentOption[] Deployments { get; init; } = [];
+    public MicrosoftFoundryDeploymentOption[] Deployments { get; init; } = [];
 }
 
-public class AzureOpenAIDeploymentOption
+public class MicrosoftFoundryDeploymentOption
 {
     public required string Name { get; init; }
     public required string DisplayName { get; init; }
     public bool Enabled { get; init; } = true;
 }
 
-public class AOAIClient : IAOAIClient
+public class FoundryClient : IFoundryClient
 {
     private readonly AzureOpenAIClient _azureClient;
-    private readonly AzureOpenAIOptions _options;
-    private readonly ILogger<AOAIClient> _logger;
+    private readonly MicrosoftFoundryOptions _options;
+    private readonly ILogger<FoundryClient> _logger;
 
     private const string SystemPrompt = """
         You are a professional translator. I will provide you with language codes like 'zh-CN', 'en-US', and content to translate.
@@ -38,7 +38,7 @@ public class AOAIClient : IAOAIClient
         Return only the translated text without any additional explanations or formatting.
         """;
 
-    public AOAIClient(IOptions<AzureOpenAIOptions> options, ILogger<AOAIClient> logger)
+    public FoundryClient(IOptions<MicrosoftFoundryOptions> options, ILogger<FoundryClient> logger)
     {
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(logger);
@@ -87,7 +87,7 @@ public class AOAIClient : IAOAIClient
 
             if (firstContent is null)
             {
-                _logger.LogWarning("Received empty response from Azure OpenAI for deployment {DeploymentName}", deploymentName);
+                _logger.LogWarning("Received empty response from Microsoft Foundry for deployment {DeploymentName}", deploymentName);
                 return string.Empty;
             }
 
@@ -108,21 +108,21 @@ public class AOAIClient : IAOAIClient
         return deployment?.Enabled == true;
     }
 
-    private static void ValidateConfiguration(AzureOpenAIOptions options)
+    private static void ValidateConfiguration(MicrosoftFoundryOptions options)
     {
         if (string.IsNullOrWhiteSpace(options.Endpoint))
         {
-            throw new InvalidOperationException("AzureOpenAI:Endpoint configuration is required.");
+            throw new InvalidOperationException("MicrosoftFoundry:Endpoint configuration is required.");
         }
 
         if (string.IsNullOrWhiteSpace(options.Key))
         {
-            throw new InvalidOperationException("AzureOpenAI:Key configuration is required.");
+            throw new InvalidOperationException("MicrosoftFoundry:Key configuration is required.");
         }
 
         if (!Uri.TryCreate(options.Endpoint, UriKind.Absolute, out _))
         {
-            throw new InvalidOperationException("AzureOpenAI:Endpoint must be a valid URI.");
+            throw new InvalidOperationException("MicrosoftFoundry:Endpoint must be a valid URI.");
         }
     }
 }

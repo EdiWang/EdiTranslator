@@ -1,13 +1,13 @@
 ﻿using Edi.Translator.Models;
-using Edi.Translator.Providers.AzureOpenAI;
+using Edi.Translator.Providers.MicrosoftFoundry;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
 
 namespace Edi.Translator.Pages;
 
-public class IndexModel(IOptions<AzureOpenAIOptions> openAIOptions) : PageModel
+public class IndexModel(IOptions<MicrosoftFoundryOptions> openAIOptions) : PageModel
 {
-    private readonly AzureOpenAIOptions _openAIOptions = openAIOptions.Value;
+    private readonly MicrosoftFoundryOptions _openAIOptions = openAIOptions.Value;
 
     public const int MaxTextLength = 5000;
 

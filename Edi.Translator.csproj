@@ -12,4 +12,8 @@
 		<PackageReference Include="Azure.AI.OpenAI" Version="2.1.0" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Providers\AzureOpenAI\" />
+	</ItemGroup>
+
 </Project>

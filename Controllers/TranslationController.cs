@@ -1,7 +1,7 @@
 ﻿using Azure;
 using Azure.AI.Translation.Text;
 using Edi.Translator.Models;
-using Edi.Translator.Providers.AzureOpenAI;
+using Edi.Translator.Providers.MicrosoftFoundry;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Options;
@@ -12,13 +12,13 @@ namespace Edi.Translator.Controllers;
 [Route("api/[controller]")]
 public class TranslationController(
     IOptions<AzureTranslatorConfig> translatorConfig,
-    IOptions<AzureOpenAIOptions> openAIOptions,
+    IOptions<MicrosoftFoundryOptions> openAIOptions,
     ILogger<TranslationController> logger,
-    IAOAIClient aoaiClient)
+    IFoundryClient foundryClient)
     : ControllerBase
 {
     private readonly AzureTranslatorConfig _translatorConfig = translatorConfig.Value;
-    private readonly AzureOpenAIOptions _openAIOptions = openAIOptions.Value;
+    private readonly MicrosoftFoundryOptions _openAIOptions = openAIOptions.Value;
 
     [HttpPost("azure-translator")]
     [EnableRateLimiting("TranslateLimiter")]
@@ -122,7 +122,7 @@ public class TranslationController(
 
         try
         {
-            var translatedText = await aoaiClient.TranslateAsync(
+            var translatedText = await foundryClient.TranslateAsync(
                 request.FromLang,
                 request.ToLang,
                 request.Content,
@@ -131,11 +131,11 @@ public class TranslationController(
 
             var result = new TranslationResult
             {
-                ProviderCode = "aoai",
+                ProviderCode = "foundry",
                 TranslatedText = translatedText
             };
 
-            logger.LogInformation("Successfully translated text using Azure OpenAI. Deployment: {DeploymentName}, From: {FromLang}, To: {ToLang}",
+            logger.LogInformation("Successfully translated text using Microsoft Foundry. Deployment: {DeploymentName}, From: {FromLang}, To: {ToLang}",
                 deploymentName, request.FromLang, request.ToLang);
 
             return Ok(result);
@@ -147,7 +147,7 @@ public class TranslationController(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error occurred while translating text using Azure OpenAI. Deployment: {DeploymentName}", deploymentName);
+            logger.LogError(ex, "Error occurred while translating text using Microsoft Foundry. Deployment: {DeploymentName}", deploymentName);
             return StatusCode(500, "An unexpected error occurred during translation");
         }
     }
@@ -166,7 +166,7 @@ public class TranslationController(
         return null;
     }
 
-    private AzureOpenAIDeploymentOption GetDeployment(string deploymentName)
+    private MicrosoftFoundryDeploymentOption GetDeployment(string deploymentName)
     {
         if (string.IsNullOrWhiteSpace(deploymentName))
         {

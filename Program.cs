@@ -1,6 +1,6 @@
 using Edi.Translator.Configuration;
 using Edi.Translator.Models;
-using Edi.Translator.Providers.AzureOpenAI;
+using Edi.Translator.Providers.MicrosoftFoundry;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
 
@@ -20,7 +20,7 @@ public class Program
         builder.Services.AddControllers();
         builder.Services.AddRazorPages();
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddScoped<IAOAIClient, AOAIClient>();
+        builder.Services.AddScoped<IFoundryClient, FoundryClient>();
 
         builder.Services.Configure<RouteOptions>(options =>
         {
@@ -56,8 +56,8 @@ public class Program
             .BindConfiguration(AzureTranslatorConfig.SectionName)
             .ValidateDataAnnotations()
             .ValidateOnStart();
-        builder.Services.AddOptions<AzureOpenAIOptions>()
-            .BindConfiguration(AzureOpenAIOptions.SectionName)
+        builder.Services.AddOptions<MicrosoftFoundryOptions>()
+            .BindConfiguration(MicrosoftFoundryOptions.SectionName)
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
