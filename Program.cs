@@ -1,6 +1,7 @@
 using Edi.Translator.Configuration;
 using Edi.Translator.Models;
 using Edi.Translator.Providers.MicrosoftFoundry;
+using Edi.Translator.Services;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
 
@@ -12,7 +13,7 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        if (Helper.IsRunningOnAzureAppService())
+        if (EnvironmentHelper.IsRunningOnAzureAppService())
         {
             builder.Logging.AddAzureWebAppDiagnostics();
         }
@@ -21,6 +22,7 @@ public class Program
         builder.Services.AddRazorPages();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddScoped<IFoundryClient, FoundryClient>();
+        builder.Services.AddSingleton<IAzureTranslatorService, AzureTranslatorService>();
 
         builder.Services.Configure<RouteOptions>(options =>
         {

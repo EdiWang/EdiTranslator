@@ -10,22 +10,6 @@ public interface IFoundryClient
     Task<string> TranslateAsync(string? fromLang, string toLang, string content, string deploymentName, CancellationToken cancellationToken = default);
 }
 
-public class MicrosoftFoundryOptions
-{
-    public const string SectionName = "MicrosoftFoundry";
-
-    public required string Endpoint { get; init; }
-    public required string Key { get; init; }
-    public MicrosoftFoundryDeploymentOption[] Deployments { get; init; } = [];
-}
-
-public class MicrosoftFoundryDeploymentOption
-{
-    public required string Name { get; init; }
-    public required string DisplayName { get; init; }
-    public bool Enabled { get; init; } = true;
-}
-
 public class FoundryClient : IFoundryClient
 {
     private readonly AzureOpenAIClient _azureClient;
@@ -70,11 +54,6 @@ public class FoundryClient : IFoundryClient
         ArgumentException.ThrowIfNullOrWhiteSpace(content);
         ArgumentException.ThrowIfNullOrWhiteSpace(deploymentName);
 
-        if (!IsValidDeployment(deploymentName))
-        {
-            throw new ArgumentException($"Invalid deployment name: {deploymentName}", nameof(deploymentName));
-        }
-
         try
         {
             var chatClient = _azureClient.GetChatClient(deploymentName);
@@ -106,14 +85,6 @@ public class FoundryClient : IFoundryClient
             _logger.LogError(ex, "Error translating text using deployment {DeploymentName}", deploymentName);
             throw;
         }
-    }
-
-    private bool IsValidDeployment(string deploymentName)
-    {
-        var deployment = _options.Deployments
-            .FirstOrDefault(d => d.Name.Equals(deploymentName, StringComparison.OrdinalIgnoreCase));
-
-        return deployment?.Enabled == true;
     }
 
     private static void ValidateConfiguration(MicrosoftFoundryOptions options)

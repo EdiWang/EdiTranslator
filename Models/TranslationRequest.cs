@@ -7,7 +7,7 @@ public class TranslationRequest
     [Required]
     public string Content { get; set; }
 
-    public string FromLang { get; set; }
+    public string? FromLang { get; set; }
 
     [Required]
     public string ToLang { get; set; }

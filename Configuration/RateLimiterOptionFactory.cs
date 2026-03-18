@@ -2,7 +2,7 @@
 
 namespace Edi.Translator.Configuration;
 
-public class RateLimiterOptionFactory
+public static class RateLimiterOptionFactory
 {
     public static Action<FixedWindowRateLimiterOptions> GetFixedWindowRateLimiterOptions(int permitLimit, TimeSpan period)
     {

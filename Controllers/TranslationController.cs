@@ -1,7 +1,7 @@
 ﻿using Azure;
-using Azure.AI.Translation.Text;
 using Edi.Translator.Models;
 using Edi.Translator.Providers.MicrosoftFoundry;
+using Edi.Translator.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Options;
@@ -11,13 +11,12 @@ namespace Edi.Translator.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 public class TranslationController(
-    IOptions<AzureTranslatorConfig> translatorConfig,
     IOptions<MicrosoftFoundryOptions> openAIOptions,
     ILogger<TranslationController> logger,
-    IFoundryClient foundryClient)
+    IFoundryClient foundryClient,
+    IAzureTranslatorService azureTranslatorService)
     : ControllerBase
 {
-    private readonly AzureTranslatorConfig _translatorConfig = translatorConfig.Value;
     private readonly MicrosoftFoundryOptions _openAIOptions = openAIOptions.Value;
 
     [HttpPost("azure-translator")]
@@ -29,51 +28,9 @@ public class TranslationController(
             return BadRequest(ModelState);
         }
 
-        // Validate configuration
-        var configValidation = ValidateTranslatorConfiguration();
-        if (configValidation != null)
-        {
-            return configValidation;
-        }
-
         try
         {
-            var client = new TextTranslationClient(
-                new AzureKeyCredential(_translatorConfig.Key),
-                new Uri(_translatorConfig.Endpoint),
-                _translatorConfig.Region);
-
-            var response = await client.TranslateAsync(
-                request.ToLang,
-                request.Content,
-                request.FromLang,
-                cancellationToken: cancellationToken);
-
-            var translations = response.Value;
-            if (!translations.Any())
-            {
-                logger.LogWarning("No translations returned from Azure Translator service");
-                return StatusCode(500, "Translation service returned no results");
-            }
-
-            var translation = translations.First();
-            if (!translation.Translations.Any())
-            {
-                logger.LogWarning("No translation text returned from Azure Translator service");
-                return StatusCode(500, "Translation service returned no translation text");
-            }
-
-            var result = new TranslationResult
-            {
-                ProviderCode = "azure-translator",
-                TranslatedText = translation.Translations[0].Text,
-                DetectedLanguage = translation.DetectedLanguage?.Language,
-                Confidence = translation.DetectedLanguage?.Score
-            };
-
-            logger.LogInformation("Successfully translated text using Azure Translator. From: {FromLang}, To: {ToLang}",
-                request.FromLang ?? "auto-detect", request.ToLang);
-
+            var result = await azureTranslatorService.TranslateAsync(request, cancellationToken);
             return Ok(result);
         }
         catch (RequestFailedException ex)
@@ -150,20 +107,6 @@ public class TranslationController(
             logger.LogError(ex, "Error occurred while translating text using Microsoft Foundry. Deployment: {DeploymentName}", deploymentName);
             return StatusCode(500, "An unexpected error occurred during translation");
         }
-    }
-
-    private ObjectResult ValidateTranslatorConfiguration()
-    {
-        if (string.IsNullOrWhiteSpace(_translatorConfig.Endpoint) ||
-            string.IsNullOrWhiteSpace(_translatorConfig.Key) ||
-            string.IsNullOrWhiteSpace(_translatorConfig.Region))
-        {
-            const string message = "Azure Translator configuration is incomplete";
-            logger.LogError(message);
-            return StatusCode(500, message);
-        }
-
-        return null;
     }
 
     private MicrosoftFoundryDeploymentOption GetDeployment(string deploymentName)
