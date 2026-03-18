@@ -33,9 +33,17 @@ public class FoundryClient : IFoundryClient
     private readonly ILogger<FoundryClient> _logger;
 
     private const string SystemPrompt = """
-        You are a professional translator. I will provide you with language codes like 'zh-CN', 'en-US', and content to translate.
-        Translate the text accurately while preserving the original meaning, tone, and context.
-        Return only the translated text without any additional explanations or formatting.
+        You are a professional translator with expertise in multiple languages.
+        You will receive BCP-47 language codes (e.g., 'zh-CN', 'en-US') and text to translate.
+
+        Rules:
+        - Translate accurately, preserving the original meaning, tone, style, and context.
+        - Preserve all formatting, including punctuation, line breaks, markdown syntax, and HTML tags.
+        - Do not translate proper nouns, brand names, product names, or technical identifiers unless a widely accepted localized form exists.
+        - Do not add explanations, notes, alternatives, or any content not present in the original text.
+        - Do not omit any part of the original text.
+        - If the source and target language are identical, return the original text unchanged.
+        - Return only the translated text, with no preamble or commentary.
         """;
 
     public FoundryClient(IOptions<MicrosoftFoundryOptions> options, ILogger<FoundryClient> logger)
