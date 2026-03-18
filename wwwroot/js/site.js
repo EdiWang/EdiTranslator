@@ -91,13 +91,11 @@ class TranslatorApp {
         this.historyManager = new TranslationHistoryManager();
         this.preferencesManager = new PreferencesManager();
         this.isBusy = false;
-        this.keepAliveInterval = null;
-        
+
         this.initializeElements();
         this.attachEventListeners();
         this.loadPreferences();
         this.renderHistory();
-        this.startKeepAlive();
     }
 
     initializeElements() {
@@ -366,17 +364,7 @@ class TranslatorApp {
         return text.substring(0, maxLength) + '…';
     }
 
-    startKeepAlive() {
-        // Keep session alive every 60 seconds
-        this.keepAliveInterval = setInterval(async () => {
-            try {
-                await fetch('/api/keepalive', { method: 'GET' });
-            } catch (error) {
-                console.error('Keep-alive error:', error);
-            }
-        }, 60000);
     }
-}
 
 // Initialize app when DOM is ready
 let app;
