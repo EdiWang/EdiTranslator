@@ -68,7 +68,7 @@ public class TranslationController(
                 ProviderCode = "azure-translator",
                 TranslatedText = translation.Translations[0].Text,
                 DetectedLanguage = translation.DetectedLanguage?.Language,
-                Confidence = translation.DetectedLanguage?.Confidence
+                Confidence = translation.DetectedLanguage?.Score
             };
 
             logger.LogInformation("Successfully translated text using Azure Translator. From: {FromLang}, To: {ToLang}",
