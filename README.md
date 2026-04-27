@@ -42,7 +42,7 @@ See `Development` section for setup the project. Then use `Release` configuratio
 
 ## Development
 
-0. Create an Azure Translator instace and get the API key and region
+0. Create an Azure Translator instance and get the API key and region
 1. Create an Microsoft Foundry project
   - Deploy chat completion models like `gpt-5.5`
   - Get the API key and endpoint
