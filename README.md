@@ -44,7 +44,7 @@ See `Development` section for setup the project. Then use `Release` configuratio
 
 0. Create an Azure Translator instace and get the API key and region
 1. Create an Microsoft Foundry project
-  - Deploy chat completion models like `gpt-5.4`
+  - Deploy chat completion models like `gpt-5.5`
   - Get the API key and endpoint
 2. Open the solution in Visual Studio
 3. Modify `appsettings.json` or create `appsettings.Development.json` and set your API key and region like this
@@ -68,6 +68,11 @@ See `Development` section for setup the project. Then use `Release` configuratio
       {
         "Name": "gpt-5.4",
         "DisplayName": "GPT-5.4 (Azure)",
+        "Enabled": true
+      },
+      {
+        "Name": "gpt-5.5",
+        "DisplayName": "GPT-5.5 (Azure)",
         "Enabled": true
       },
       {
