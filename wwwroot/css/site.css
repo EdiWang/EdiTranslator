@@ -116,6 +116,8 @@ section.translator-text-container {
 }
 
 .source-text {
+    --block-size: 280px;
+    --min-block-size: 220px;
     font-size: 16px;
     line-height: 25px;
 }
@@ -142,7 +144,7 @@ section.translator-text-container {
     color: #666;
 }
 
-fluent-text-area {
+fluent-textarea {
     width: 100%;
 }
 
@@ -168,6 +170,9 @@ fluent-text-area {
 }
 
 .translation-item {
+    background-color: #fff;
+    border: 1px solid #d1d1d1;
+    border-radius: 4px;
     padding: 10px;
     transition: background-color 0.3s;
     font-size: 14px;
@@ -199,10 +204,14 @@ footer p {
 }
 
 /* Fluent UI Overrides */
-fluent-select,
+fluent-dropdown,
 fluent-button,
-fluent-text-area,
-fluent-card,
-fluent-progress {
-    --accent-fill-rest: #0078d4;
+fluent-textarea,
+fluent-progress-bar {
+    --colorBrandBackground: #0078d4;
+}
+
+fluent-progress-bar {
+    display: block;
+    width: 100%;
 }

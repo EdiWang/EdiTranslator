@@ -9,7 +9,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Edi's Translator</title>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@@fluentui/web-components/dist/web-components.min.js"></script>
+    <script type="module">
+        import { setTheme } from 'https://unpkg.com/@@fluentui/web-components@3.0.0-rc.19/dist/web-components-all.min.js';
+        import { webLightTheme } from 'https://unpkg.com/@@fluentui/tokens@1.0.0-alpha.23/lib/index.js';
+
+        setTheme(webLightTheme);
+    </script>
 </head>
 <body>
     <header class="mb-4">
@@ -18,7 +23,7 @@
             <small>@version</small>
         </nav>
         <div id="progress-container" style="display: none;">
-            <fluent-progress indeterminate></fluent-progress>
+            <fluent-progress-bar></fluent-progress-bar>
         </div>
     </header>
 
