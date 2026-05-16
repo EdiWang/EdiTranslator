@@ -135,24 +135,10 @@ class TranslatorApp {
 
     loadPreferences() {
         const prefs = this.preferencesManager.load();
-        
-        if (prefs.sourceLanguage) {
-            this.sourceLanguage.value = prefs.sourceLanguage;
-        } else {
-            this.sourceLanguage.value = 'auto-detect';
-        }
 
-        if (prefs.targetLanguage) {
-            this.targetLanguage.value = prefs.targetLanguage;
-        } else {
-            this.targetLanguage.value = 'en-US';
-        }
-
-        if (prefs.apiProvider) {
-            this.apiProvider.value = prefs.apiProvider;
-        } else {
-            this.apiProvider.value = 'azure-translator';
-        }
+        this.setDropdownValue(this.sourceLanguage, prefs.sourceLanguage, 'auto-detect');
+        this.setDropdownValue(this.targetLanguage, prefs.targetLanguage, 'en-US');
+        this.setDropdownValue(this.apiProvider, prefs.apiProvider, 'azure-translator');
     }
 
     showError(message) {
@@ -274,8 +260,8 @@ class TranslatorApp {
             return;
         }
 
-        this.sourceLanguage.value = currentTarget;
-        this.targetLanguage.value = currentSource;
+        this.setDropdownValue(this.sourceLanguage, currentTarget);
+        this.setDropdownValue(this.targetLanguage, currentSource);
 
         // Also swap the text content
         const currentTranslated = this.translatedText.textContent;
@@ -302,21 +288,21 @@ class TranslatorApp {
             const date = new Date(translation.Date).toLocaleString();
             html += `
                 <li>
-                    <fluent-card class="translation-item mb-3">
+                    <div class="translation-item mb-3">
                         <div class="hs-date mb-2">${date}, ${translation.Provider.Name}</div>
                         <div><strong>${translation.SourceLanguage.Name}</strong></div>
                         <div class="mb-2">${this.escapeHtml(this.truncateText(translation.SourceText))}</div>
                         <div><strong>${translation.TargetLanguage.Name}</strong></div>
                         <div class="mb-2">${this.escapeHtml(this.truncateText(translation.TranslatedText))}</div>
-                        <fluent-button appearance="outline" class="me-2" onclick="app.loadTranslation(${translation.Id})">Load</fluent-button>
-                        <fluent-button appearance="outline" onclick="app.deleteTranslation(${translation.Id})">Delete</fluent-button>
-                    </fluent-card>
+                        <fluent-button appearance="secondary" class="me-2" onclick="app.loadTranslation(${translation.Id})">Load</fluent-button>
+                        <fluent-button appearance="secondary" onclick="app.deleteTranslation(${translation.Id})">Delete</fluent-button>
+                    </div>
                 </li>
             `;
         });
 
         html += '</ul></div>';
-        html += '<fluent-button appearance="neutral" onclick="app.clearHistory()">Clear All History</fluent-button>';
+        html += '<fluent-button appearance="secondary" onclick="app.clearHistory()">Clear All History</fluent-button>';
         
         this.historyContainer.innerHTML = html;
     }
@@ -326,10 +312,10 @@ class TranslatorApp {
         const translation = translations.find(t => t.Id === id);
         
         if (translation) {
-            this.sourceLanguage.value = translation.SourceLanguage.Code;
-            this.targetLanguage.value = translation.TargetLanguage.Code;
+            this.setDropdownValue(this.sourceLanguage, translation.SourceLanguage.Code);
+            this.setDropdownValue(this.targetLanguage, translation.TargetLanguage.Code);
             this.sourceText.value = translation.SourceText;
-            this.apiProvider.value = translation.Provider.ApiRoute;
+            this.setDropdownValue(this.apiProvider, translation.Provider.ApiRoute);
             this.translatedText.textContent = translation.TranslatedText;
             
             this.charCount.textContent = translation.SourceText.length;
@@ -364,14 +350,54 @@ class TranslatorApp {
         return text.substring(0, maxLength) + '…';
     }
 
+    setDropdownValue(dropdown, value, fallbackValue) {
+        const optionValue = this.findDropdownOptionValue(dropdown, value)
+            ?? this.findDropdownOptionValue(dropdown, fallbackValue)
+            ?? dropdown.querySelector('fluent-option')?.value;
+
+        if (!optionValue) {
+            return;
+        }
+
+        try {
+            dropdown.value = optionValue;
+        } catch (error) {
+            dropdown.setAttribute('value', optionValue);
+        }
+    }
+
+    findDropdownOptionValue(dropdown, value) {
+        if (!value) {
+            return null;
+        }
+
+        return Array.from(dropdown.querySelectorAll('fluent-option'))
+            .find(option => option.value === value)
+            ?.value ?? null;
+    }
+
     }
 
 // Initialize app when DOM is ready
 let app;
+async function initializeApp() {
+    await Promise.all([
+        customElements.whenDefined('fluent-button'),
+        customElements.whenDefined('fluent-dropdown'),
+        customElements.whenDefined('fluent-listbox'),
+        customElements.whenDefined('fluent-option'),
+        customElements.whenDefined('fluent-textarea')
+    ]);
+    await new Promise(requestAnimationFrame);
+
+    app = new TranslatorApp();
+    window.app = app;
+}
+
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-        app = new TranslatorApp();
+        initializeApp();
     });
 } else {
-    app = new TranslatorApp();
+    initializeApp();
 }
