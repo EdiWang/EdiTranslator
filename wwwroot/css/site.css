@@ -116,6 +116,8 @@ section.translator-text-container {
 }
 
 .source-text {
+    --block-size: 280px;
+    --min-block-size: 220px;
     font-size: 16px;
     line-height: 25px;
 }
