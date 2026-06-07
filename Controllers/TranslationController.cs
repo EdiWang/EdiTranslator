@@ -5,6 +5,7 @@ using Edi.Translator.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Options;
+using System.Text.Json;
 
 namespace Edi.Translator.Controllers;
 
@@ -109,6 +110,79 @@ public class TranslationController(
         }
     }
 
+    [HttpPost("ai/{deploymentName}/stream")]
+    [EnableRateLimiting("TranslateLimiter")]
+    public async Task<IActionResult> TranslateByAzureAIStreaming(
+        [FromBody] TranslationRequest request,
+        [FromRoute] string deploymentName,
+        CancellationToken cancellationToken = default)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var deployment = GetDeployment(deploymentName);
+        if (deployment == null)
+        {
+            logger.LogWarning("Invalid deployment name requested: {DeploymentName}", deploymentName);
+            return BadRequest($"Invalid deployment name: {deploymentName}");
+        }
+
+        if (!deployment.Enabled)
+        {
+            logger.LogWarning("Deployment disabled: {DeploymentName}", deploymentName);
+            return StatusCode(StatusCodes.Status403Forbidden, $"Deployment disabled: {deploymentName}");
+        }
+
+        Response.ContentType = "application/x-ndjson; charset=utf-8";
+        Response.Headers.CacheControl = "no-cache";
+        Response.Headers.TryAdd("X-Accel-Buffering", "no");
+
+        try
+        {
+            await foreach (var text in foundryClient.TranslateStreamingAsync(
+                request.FromLang,
+                request.ToLang,
+                request.Content,
+                deploymentName,
+                cancellationToken))
+            {
+                await WriteStreamEventAsync(new { type = "delta", text }, cancellationToken);
+            }
+
+            await WriteStreamEventAsync(new { type = "done", providerCode = "foundry" }, cancellationToken);
+
+            logger.LogInformation("Successfully streamed translation using Microsoft Foundry. Deployment: {DeploymentName}, From: {FromLang}, To: {ToLang}",
+                deploymentName, request.FromLang, request.ToLang);
+
+            return new EmptyResult();
+        }
+        catch (OperationCanceledException)
+        {
+            logger.LogWarning("OpenAI streaming translation request was cancelled");
+
+            if (Response.HasStarted)
+            {
+                return new EmptyResult();
+            }
+
+            return StatusCode(408, "Request timeout");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error occurred while streaming translation using Microsoft Foundry. Deployment: {DeploymentName}", deploymentName);
+
+            if (Response.HasStarted)
+            {
+                await WriteStreamEventAsync(new { type = "error", message = "An unexpected error occurred during translation" }, cancellationToken);
+                return new EmptyResult();
+            }
+
+            return StatusCode(500, "An unexpected error occurred during translation");
+        }
+    }
+
     private MicrosoftFoundryDeploymentOption GetDeployment(string deploymentName)
     {
         if (string.IsNullOrWhiteSpace(deploymentName))
@@ -118,5 +192,13 @@ public class TranslationController(
 
         return _openAIOptions.Deployments?
             .FirstOrDefault(d => d.Name.Equals(deploymentName, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private async Task WriteStreamEventAsync<TEvent>(TEvent streamEvent, CancellationToken cancellationToken)
+    {
+        var line = JsonSerializer.Serialize(streamEvent);
+        await Response.WriteAsync(line, cancellationToken);
+        await Response.WriteAsync("\n", cancellationToken);
+        await Response.Body.FlushAsync(cancellationToken);
     }
 }

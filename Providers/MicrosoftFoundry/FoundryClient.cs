@@ -2,12 +2,14 @@ using Azure.AI.OpenAI;
 using Microsoft.Extensions.Options;
 using OpenAI.Chat;
 using System.ClientModel;
+using System.Runtime.CompilerServices;
 
 namespace Edi.Translator.Providers.MicrosoftFoundry;
 
 public interface IFoundryClient
 {
     Task<string> TranslateAsync(string? fromLang, string toLang, string content, string deploymentName, CancellationToken cancellationToken = default);
+    IAsyncEnumerable<string> TranslateStreamingAsync(string? fromLang, string toLang, string content, string deploymentName, CancellationToken cancellationToken = default);
 }
 
 public class FoundryClient : IFoundryClient
@@ -58,16 +60,8 @@ public class FoundryClient : IFoundryClient
         {
             var chatClient = _azureClient.GetChatClient(deploymentName);
 
-            var systemMessage = new SystemChatMessage(SystemPrompt);
-
-            var prompt = string.IsNullOrWhiteSpace(fromLang)
-                ? $"Auto-detect the source language and translate the following text to {toLang}: {content}"
-                : $"Translate the following text from {fromLang} to {toLang}: {content}";
-
-            var userMessage = new UserChatMessage(prompt);
-
             var response = await chatClient.CompleteChatAsync(
-                [systemMessage, userMessage],
+                BuildMessages(fromLang, toLang, content),
                 cancellationToken: cancellationToken);
 
             var firstContent = response?.Value?.Content?.FirstOrDefault();
@@ -85,6 +79,47 @@ public class FoundryClient : IFoundryClient
             _logger.LogError(ex, "Error translating text using deployment {DeploymentName}", deploymentName);
             throw;
         }
+    }
+
+    public async IAsyncEnumerable<string> TranslateStreamingAsync(
+        string? fromLang,
+        string toLang,
+        string content,
+        string deploymentName,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(toLang);
+        ArgumentException.ThrowIfNullOrWhiteSpace(content);
+        ArgumentException.ThrowIfNullOrWhiteSpace(deploymentName);
+
+        var chatClient = _azureClient.GetChatClient(deploymentName);
+        var updates = chatClient.CompleteChatStreamingAsync(
+            BuildMessages(fromLang, toLang, content),
+            cancellationToken: cancellationToken);
+
+        await foreach (var update in updates.WithCancellation(cancellationToken))
+        {
+            foreach (var contentPart in update.ContentUpdate)
+            {
+                if (!string.IsNullOrEmpty(contentPart.Text))
+                {
+                    yield return contentPart.Text;
+                }
+            }
+        }
+    }
+
+    private static ChatMessage[] BuildMessages(string? fromLang, string toLang, string content)
+    {
+        var systemMessage = new SystemChatMessage(SystemPrompt);
+
+        var prompt = string.IsNullOrWhiteSpace(fromLang)
+            ? $"Auto-detect the source language and translate the following text to {toLang}: {content}"
+            : $"Translate the following text from {fromLang} to {toLang}: {content}";
+
+        var userMessage = new UserChatMessage(prompt);
+
+        return [systemMessage, userMessage];
     }
 
     private static void ValidateConfiguration(MicrosoftFoundryOptions options)

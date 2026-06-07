@@ -185,6 +185,11 @@ class TranslatorApp {
         };
 
         try {
+            if (apiProvider.startsWith('ai/')) {
+                await this.translateStreaming(apiProvider, requestBody, sourceText, sourceLanguage, targetLanguage);
+                return;
+            }
+
             const response = await fetch(`/api/translation/${apiProvider}`, {
                 method: 'POST',
                 headers: {
@@ -203,27 +208,95 @@ class TranslatorApp {
             this.translatedCharCount.textContent = data.translatedText.length;
             this.copyBtn.disabled = false;
 
-            // Save to history
-            const sourceLang = window.languageList.find(l => l.Code === sourceLanguage);
-            const targetLang = window.languageList.find(l => l.Code === targetLanguage);
-            const provider = window.providerList.find(p => p.ApiRoute === apiProvider);
-
-            if (sourceLang && targetLang && provider) {
-                this.historyManager.saveTranslation(
-                    sourceLang,
-                    targetLang,
-                    sourceText,
-                    data.translatedText,
-                    provider
-                );
-                this.renderHistory();
-            }
+            this.saveTranslationToHistory(sourceText, data.translatedText, sourceLanguage, targetLanguage, apiProvider);
 
         } catch (error) {
             console.error('Translation error:', error);
             this.showError(error.message || 'An error occurred while translating the text. Please try again.');
         } finally {
             this.hideProgress();
+        }
+    }
+
+    async translateStreaming(apiProvider, requestBody, sourceText, sourceLanguage, targetLanguage) {
+        const response = await fetch(`/api/translation/${apiProvider}/stream`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/x-ndjson'
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || `HTTP error! status: ${response.status}`);
+        }
+
+        if (!response.body) {
+            throw new Error('Streaming is not supported by this browser.');
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let translatedText = '';
+
+        const handleLine = (line) => {
+            if (!line.trim()) {
+                return;
+            }
+
+            const event = JSON.parse(line);
+
+            if (event.type === 'delta') {
+                translatedText += event.text || '';
+                this.translatedText.textContent = translatedText;
+                this.translatedCharCount.textContent = translatedText.length;
+                this.copyBtn.disabled = translatedText.length === 0;
+                return;
+            }
+
+            if (event.type === 'error') {
+                throw new Error(event.message || 'An error occurred while translating the text.');
+            }
+        };
+
+        while (true) {
+            const { value, done } = await reader.read();
+
+            if (done) {
+                break;
+            }
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop() || '';
+
+            lines.forEach(handleLine);
+        }
+
+        buffer += decoder.decode();
+        handleLine(buffer);
+
+        this.copyBtn.disabled = translatedText.length === 0;
+        this.saveTranslationToHistory(sourceText, translatedText, sourceLanguage, targetLanguage, apiProvider);
+    }
+
+    saveTranslationToHistory(sourceText, translatedText, sourceLanguage, targetLanguage, apiProvider) {
+        const sourceLang = window.languageList.find(l => l.Code === sourceLanguage);
+        const targetLang = window.languageList.find(l => l.Code === targetLanguage);
+        const provider = window.providerList.find(p => p.ApiRoute === apiProvider);
+
+        if (sourceLang && targetLang && provider) {
+            this.historyManager.saveTranslation(
+                sourceLang,
+                targetLang,
+                sourceText,
+                translatedText,
+                provider
+            );
+            this.renderHistory();
         }
     }
 
