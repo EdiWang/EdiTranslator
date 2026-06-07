@@ -62,11 +62,11 @@
                 <div class="col-md-12 col-lg-6">
                     <section class="translator-text-container">
                         <div>
-                            <fluent-dropdown id="apiProvider" title="API" value="azure-translator">
+                            <fluent-dropdown id="deploymentName" title="Deployment" value="@Model.DeploymentList.FirstOrDefault()?.Name">
                                 <fluent-listbox>
-                                    @foreach (var provider in Model.ProviderList)
+                                    @foreach (var deployment in Model.DeploymentList)
                                     {
-                                        <fluent-option value="@provider.ApiRoute">@provider.Name</fluent-option>
+                                        <fluent-option value="@deployment.Name">@deployment.DisplayName</fluent-option>
                                     }
                                 </fluent-listbox>
                             </fluent-dropdown>
@@ -93,8 +93,8 @@
 
 @section Scripts {
     <script>
-        // Language and provider lists for JavaScript
+        // Language and deployment lists for JavaScript
         window.languageList = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(IndexModel.LanguageList));
-        window.providerList = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ProviderList));
+        window.deploymentList = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DeploymentList));
     </script>
 }

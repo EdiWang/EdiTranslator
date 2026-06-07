@@ -1,7 +1,5 @@
 using Edi.Translator.Configuration;
-using Edi.Translator.Models;
 using Edi.Translator.Providers.MicrosoftFoundry;
-using Edi.Translator.Services;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
 
@@ -22,7 +20,6 @@ public class Program
         builder.Services.AddRazorPages();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddScoped<IFoundryClient, FoundryClient>();
-        builder.Services.AddSingleton<IAzureTranslatorService, AzureTranslatorService>();
 
         builder.Services.Configure<RouteOptions>(options =>
         {
@@ -54,10 +51,6 @@ public class Program
             AddLimiter("TranslateLimiter", 5, TimeSpan.FromSeconds(1));
         });
 
-        builder.Services.AddOptions<AzureTranslatorConfig>()
-            .BindConfiguration(AzureTranslatorConfig.SectionName)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
         builder.Services.AddOptions<MicrosoftFoundryOptions>()
             .BindConfiguration(MicrosoftFoundryOptions.SectionName)
             .ValidateDataAnnotations()

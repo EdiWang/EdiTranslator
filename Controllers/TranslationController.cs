@@ -1,7 +1,5 @@
-﻿using Azure;
 using Edi.Translator.Models;
 using Edi.Translator.Providers.MicrosoftFoundry;
-using Edi.Translator.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Options;
@@ -12,49 +10,16 @@ namespace Edi.Translator.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 public class TranslationController(
-    IOptions<MicrosoftFoundryOptions> openAIOptions,
+    IOptions<MicrosoftFoundryOptions> foundryOptions,
     ILogger<TranslationController> logger,
-    IFoundryClient foundryClient,
-    IAzureTranslatorService azureTranslatorService)
+    IFoundryClient foundryClient)
     : ControllerBase
 {
-    private readonly MicrosoftFoundryOptions _openAIOptions = openAIOptions.Value;
+    private readonly MicrosoftFoundryOptions _foundryOptions = foundryOptions.Value;
 
-    [HttpPost("azure-translator")]
+    [HttpPost("{deploymentName}")]
     [EnableRateLimiting("TranslateLimiter")]
-    public async Task<IActionResult> Translate([FromBody] TranslationRequest request, CancellationToken cancellationToken = default)
-    {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-
-        try
-        {
-            var result = await azureTranslatorService.TranslateAsync(request, cancellationToken);
-            return Ok(result);
-        }
-        catch (RequestFailedException ex)
-        {
-            logger.LogError(ex, "Azure Translator API request failed. Status: {Status}, Error: {Error}",
-                ex.Status, ex.ErrorCode);
-            return StatusCode(503, "Translation service is temporarily unavailable");
-        }
-        catch (OperationCanceledException)
-        {
-            logger.LogWarning("Translation request was cancelled");
-            return StatusCode(408, "Request timeout");
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Unexpected error occurred while translating text");
-            return StatusCode(500, "An unexpected error occurred during translation");
-        }
-    }
-
-    [HttpPost("ai/{deploymentName}")]
-    [EnableRateLimiting("TranslateLimiter")]
-    public async Task<IActionResult> TranslateByAzureAI(
+    public async Task<IActionResult> Translate(
         [FromBody] TranslationRequest request,
         [FromRoute] string deploymentName,
         CancellationToken cancellationToken = default)
@@ -64,7 +29,6 @@ public class TranslationController(
             return BadRequest(ModelState);
         }
 
-        // Validate deployment name
         var deployment = GetDeployment(deploymentName);
         if (deployment == null)
         {
@@ -89,7 +53,7 @@ public class TranslationController(
 
             var result = new TranslationResult
             {
-                ProviderCode = "foundry",
+                DeploymentName = deploymentName,
                 TranslatedText = translatedText
             };
 
@@ -100,7 +64,7 @@ public class TranslationController(
         }
         catch (OperationCanceledException)
         {
-            logger.LogWarning("OpenAI translation request was cancelled");
+            logger.LogWarning("Microsoft Foundry translation request was cancelled");
             return StatusCode(408, "Request timeout");
         }
         catch (Exception ex)
@@ -110,9 +74,9 @@ public class TranslationController(
         }
     }
 
-    [HttpPost("ai/{deploymentName}/stream")]
+    [HttpPost("{deploymentName}/stream")]
     [EnableRateLimiting("TranslateLimiter")]
-    public async Task<IActionResult> TranslateByAzureAIStreaming(
+    public async Task<IActionResult> TranslateStreaming(
         [FromBody] TranslationRequest request,
         [FromRoute] string deploymentName,
         CancellationToken cancellationToken = default)
@@ -151,7 +115,7 @@ public class TranslationController(
                 await WriteStreamEventAsync(new { type = "delta", text }, cancellationToken);
             }
 
-            await WriteStreamEventAsync(new { type = "done", providerCode = "foundry" }, cancellationToken);
+            await WriteStreamEventAsync(new { type = "done", deploymentName }, cancellationToken);
 
             logger.LogInformation("Successfully streamed translation using Microsoft Foundry. Deployment: {DeploymentName}, From: {FromLang}, To: {ToLang}",
                 deploymentName, request.FromLang, request.ToLang);
@@ -160,7 +124,7 @@ public class TranslationController(
         }
         catch (OperationCanceledException)
         {
-            logger.LogWarning("OpenAI streaming translation request was cancelled");
+            logger.LogWarning("Microsoft Foundry streaming translation request was cancelled");
 
             if (Response.HasStarted)
             {
@@ -190,7 +154,7 @@ public class TranslationController(
             return null;
         }
 
-        return _openAIOptions.Deployments?
+        return _foundryOptions.Deployments?
             .FirstOrDefault(d => d.Name.Equals(deploymentName, StringComparison.OrdinalIgnoreCase));
     }
 

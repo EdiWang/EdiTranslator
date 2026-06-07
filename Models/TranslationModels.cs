@@ -6,8 +6,8 @@ public class LanguageChoice
     public string Name { get; set; } = string.Empty;
 }
 
-public class ApiProvider
+public class FoundryDeploymentChoice
 {
     public string Name { get; set; } = string.Empty;
-    public string ApiRoute { get; set; } = string.Empty;
+    public string DisplayName { get; set; } = string.Empty;
 }

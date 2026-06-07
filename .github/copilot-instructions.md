@@ -11,30 +11,29 @@ This is a .NET 10 ASP.NET Core web app for text translation. It serves a Razor P
 ## Architecture
 
 - `Program.cs` wires services, strongly typed options, route casing, static files, rate limiting, Razor Pages, and controllers.
-- `Controllers/TranslationController.cs` owns HTTP API behavior under `/api/translation/*` and should stay thin: validate input, select provider/deployment, call services, map exceptions to HTTP responses, and log with structured properties.
-- `Services/AzureTranslatorService.cs` wraps Azure Translator SDK calls and returns `TranslationResult`.
+- `Controllers/TranslationController.cs` owns HTTP API behavior under `/api/translation/*` and should stay thin: validate input, select deployment, call the Foundry client, map exceptions to HTTP responses, and log with structured properties.
 - `Providers/MicrosoftFoundry/FoundryClient.cs` wraps Azure OpenAI/Microsoft Foundry chat completions. Preserve the system prompt rules when adjusting AI translation behavior.
-- `Pages/Index.cshtml.cs` provides language and provider lists to the Razor UI. `wwwroot/js/site.js` owns browser interaction, localStorage history, preferences, and calls `/api/translation/{provider}`.
+- `Pages/Index.cshtml.cs` provides language and Microsoft Foundry deployment lists to the Razor UI. `wwwroot/js/site.js` owns browser interaction, localStorage history, preferences, and calls `/api/translation/{deploymentName}/stream`.
 
 ## Coding Conventions
 
 - Prefer the existing ASP.NET Core Options pattern: add configuration classes with `SectionName`, bind them in `Program.cs`, validate with data annotations when possible, and call `ValidateOnStart()` for required external service settings.
-- Preserve cancellation-token flow from controllers into provider/service methods.
+- Preserve cancellation-token flow from controllers into Foundry client methods.
 - Use structured logging placeholders instead of string interpolation in logs.
-- Keep API DTOs in `Models/` and provider-specific options or clients in their provider folder.
+- Keep API DTOs in `Models/` and Foundry-specific options or clients in `Providers/MicrosoftFoundry/`.
 - Keep route URLs lowercase and compatible with the configured lowercase route options.
-- Do not store real Azure Translator, Foundry, OpenAI, or Docker credentials in source. Use environment variables, user secrets, or `appsettings.Development.json` for local values.
-- Avoid broad refactors while changing provider behavior; maintain the existing small-service boundaries.
+- Do not store real Foundry, OpenAI, or Docker credentials in source. Use environment variables, user secrets, or `appsettings.Development.json` for local values.
+- Avoid broad refactors while changing Foundry behavior; maintain the existing small-service boundaries.
 
-## Translation Provider Changes
+## Microsoft Foundry Translation Changes
 
-When adding or changing a translation provider, update all affected surfaces:
+Microsoft Foundry is the only translation backend. When changing Foundry behavior or deployment selection, update all affected surfaces:
 
-- Register the client/service in `Program.cs` with a lifetime appropriate for its SDK usage.
+- Register the client in `Program.cs` with a lifetime appropriate for its SDK usage.
 - Add or update strongly typed options and configuration examples in `appsettings.json` only with placeholder values.
-- Expose the provider through `IndexModel.ProviderList` if it should appear in the UI.
+- Expose enabled deployments through `IndexModel.DeploymentList` if they should appear in the UI.
 - Add or adjust the controller endpoint under `/api/translation/*` and keep request/response models compatible with `site.js`.
-- Return `TranslationResult` with a stable `ProviderCode`; include detected-language metadata when the provider supplies it.
+- Return `TranslationResult` with the selected deployment name.
 - Preserve rate limiting with the `TranslateLimiter` policy for translation endpoints.
 
 ## Frontend Conventions
@@ -51,7 +50,7 @@ When adding or changing a translation provider, update all affected surfaces:
 - Run locally: `dotnet run --project Edi.Translator.csproj`
 - Docker build: `docker build -t editranslator .`
 
-There is no test project in the current repository. For changes that affect provider selection, API behavior, validation, or error handling, prefer adding focused tests if a test project is introduced.
+There is no test project in the current repository. For changes that affect deployment selection, API behavior, validation, or error handling, prefer adding focused tests if a test project is introduced.
 
 ## Deployment Notes
 

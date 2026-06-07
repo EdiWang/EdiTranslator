@@ -5,9 +5,9 @@ using Microsoft.Extensions.Options;
 
 namespace Edi.Translator.Pages;
 
-public class IndexModel(IOptions<MicrosoftFoundryOptions> openAIOptions) : PageModel
+public class IndexModel(IOptions<MicrosoftFoundryOptions> foundryOptions) : PageModel
 {
-    private readonly MicrosoftFoundryOptions _openAIOptions = openAIOptions.Value;
+    private readonly MicrosoftFoundryOptions _foundryOptions = foundryOptions.Value;
 
     public const int MaxTextLength = 5000;
 
@@ -35,29 +35,15 @@ public class IndexModel(IOptions<MicrosoftFoundryOptions> openAIOptions) : PageM
         new LanguageChoice { Code = "vi", Name = "Tiếng Việt (Vietnamese)" }
     ];
 
-    public ApiProvider[] ProviderList
-    {
-        get
-        {
-            var providers = new List<ApiProvider>
+    public FoundryDeploymentChoice[] DeploymentList =>
+        _foundryOptions.Deployments?
+            .Where(d => d.Enabled)
+            .Select(d => new FoundryDeploymentChoice
             {
-                new ApiProvider { Name = "Azure Translator", ApiRoute = "azure-translator" }
-            };
-
-            if (_openAIOptions.Deployments != null)
-            {
-                providers.AddRange(_openAIOptions.Deployments
-                    .Where(d => d.Enabled)
-                    .Select(d => new ApiProvider
-                    {
-                        Name = d.DisplayName,
-                        ApiRoute = $"ai/{d.Name}"
-                    }));
-            }
-
-            return providers.ToArray();
-        }
-    }
+                Name = d.Name,
+                DisplayName = d.DisplayName
+            })
+            .ToArray() ?? [];
 
     public void OnGet()
     {

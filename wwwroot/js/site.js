@@ -5,7 +5,7 @@ class TranslationHistoryManager {
         this.maxHistoryItems = 50;
     }
 
-    saveTranslation(sourceLanguage, targetLanguage, sourceText, translatedText, provider) {
+    saveTranslation(sourceLanguage, targetLanguage, sourceText, translatedText, deployment) {
         const history = this.getAllTranslations();
         const newId = history.length > 0 ? Math.max(...history.map(h => h.Id)) + 1 : 1;
         
@@ -16,7 +16,7 @@ class TranslationHistoryManager {
             TargetLanguage: targetLanguage,
             SourceText: sourceText,
             TranslatedText: translatedText,
-            Provider: provider
+            Deployment: deployment
         };
 
         history.unshift(translation);
@@ -57,15 +57,15 @@ class PreferencesManager {
         this.keys = {
             sourceLanguage: 'sourceLanguage',
             targetLanguage: 'targetLanguage',
-            apiProvider: 'apiProvider'
+            deploymentName: 'deploymentName'
         };
     }
 
-    save(sourceLanguage, targetLanguage, apiProvider) {
+    save(sourceLanguage, targetLanguage, deploymentName) {
         try {
             localStorage.setItem(this.keys.sourceLanguage, sourceLanguage);
             localStorage.setItem(this.keys.targetLanguage, targetLanguage);
-            localStorage.setItem(this.keys.apiProvider, apiProvider);
+            localStorage.setItem(this.keys.deploymentName, deploymentName);
         } catch (error) {
             console.warn('Failed to save preferences:', error);
         }
@@ -76,7 +76,7 @@ class PreferencesManager {
             return {
                 sourceLanguage: localStorage.getItem(this.keys.sourceLanguage),
                 targetLanguage: localStorage.getItem(this.keys.targetLanguage),
-                apiProvider: localStorage.getItem(this.keys.apiProvider)
+                deploymentName: localStorage.getItem(this.keys.deploymentName)
             };
         } catch (error) {
             console.warn('Failed to load preferences:', error);
@@ -102,7 +102,7 @@ class TranslatorApp {
         this.sourceText = document.getElementById('sourceText');
         this.sourceLanguage = document.getElementById('sourceLanguage');
         this.targetLanguage = document.getElementById('targetLanguage');
-        this.apiProvider = document.getElementById('apiProvider');
+        this.deploymentName = document.getElementById('deploymentName');
         this.translatedText = document.getElementById('translatedText');
         this.translateBtn = document.getElementById('translateBtn');
         this.clearBtn = document.getElementById('clearBtn');
@@ -138,7 +138,7 @@ class TranslatorApp {
 
         this.setDropdownValue(this.sourceLanguage, prefs.sourceLanguage, 'auto-detect');
         this.setDropdownValue(this.targetLanguage, prefs.targetLanguage, 'en-US');
-        this.setDropdownValue(this.apiProvider, prefs.apiProvider, 'azure-translator');
+        this.setDropdownValue(this.deploymentName, prefs.deploymentName);
     }
 
     showError(message) {
@@ -173,10 +173,16 @@ class TranslatorApp {
         const sourceText = this.sourceText.value;
         const sourceLanguage = this.sourceLanguage.value;
         const targetLanguage = this.targetLanguage.value;
-        const apiProvider = this.apiProvider.value;
+        const deploymentName = this.deploymentName.value;
+
+        if (!deploymentName) {
+            this.showError('No Microsoft Foundry deployment is available.');
+            this.hideProgress();
+            return;
+        }
 
         // Save preferences
-        this.preferencesManager.save(sourceLanguage, targetLanguage, apiProvider);
+        this.preferencesManager.save(sourceLanguage, targetLanguage, deploymentName);
 
         const requestBody = {
             Content: sourceText,
@@ -185,30 +191,7 @@ class TranslatorApp {
         };
 
         try {
-            if (apiProvider.startsWith('ai/')) {
-                await this.translateStreaming(apiProvider, requestBody, sourceText, sourceLanguage, targetLanguage);
-                return;
-            }
-
-            const response = await fetch(`/api/translation/${apiProvider}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(requestBody)
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(errorText || `HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            this.translatedText.textContent = data.translatedText;
-            this.translatedCharCount.textContent = data.translatedText.length;
-            this.copyBtn.disabled = false;
-
-            this.saveTranslationToHistory(sourceText, data.translatedText, sourceLanguage, targetLanguage, apiProvider);
+            await this.translateStreaming(deploymentName, requestBody, sourceText, sourceLanguage, targetLanguage);
 
         } catch (error) {
             console.error('Translation error:', error);
@@ -218,8 +201,8 @@ class TranslatorApp {
         }
     }
 
-    async translateStreaming(apiProvider, requestBody, sourceText, sourceLanguage, targetLanguage) {
-        const response = await fetch(`/api/translation/${apiProvider}/stream`, {
+    async translateStreaming(deploymentName, requestBody, sourceText, sourceLanguage, targetLanguage) {
+        const response = await fetch(`/api/translation/${deploymentName}/stream`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -280,21 +263,21 @@ class TranslatorApp {
         handleLine(buffer);
 
         this.copyBtn.disabled = translatedText.length === 0;
-        this.saveTranslationToHistory(sourceText, translatedText, sourceLanguage, targetLanguage, apiProvider);
+        this.saveTranslationToHistory(sourceText, translatedText, sourceLanguage, targetLanguage, deploymentName);
     }
 
-    saveTranslationToHistory(sourceText, translatedText, sourceLanguage, targetLanguage, apiProvider) {
+    saveTranslationToHistory(sourceText, translatedText, sourceLanguage, targetLanguage, deploymentName) {
         const sourceLang = window.languageList.find(l => l.Code === sourceLanguage);
         const targetLang = window.languageList.find(l => l.Code === targetLanguage);
-        const provider = window.providerList.find(p => p.ApiRoute === apiProvider);
+        const deployment = window.deploymentList.find(d => d.Name === deploymentName);
 
-        if (sourceLang && targetLang && provider) {
+        if (sourceLang && targetLang && deployment) {
             this.historyManager.saveTranslation(
                 sourceLang,
                 targetLang,
                 sourceText,
                 translatedText,
-                provider
+                deployment
             );
             this.renderHistory();
         }
@@ -359,10 +342,11 @@ class TranslatorApp {
         
         translations.forEach(translation => {
             const date = new Date(translation.Date).toLocaleString();
+            const deployment = this.getHistoryDeployment(translation);
             html += `
                 <li>
                     <div class="translation-item mb-3">
-                        <div class="hs-date mb-2">${date}, ${translation.Provider.Name}</div>
+                        <div class="hs-date mb-2">${date}, ${this.escapeHtml(deployment.DisplayName)}</div>
                         <div><strong>${translation.SourceLanguage.Name}</strong></div>
                         <div class="mb-2">${this.escapeHtml(this.truncateText(translation.SourceText))}</div>
                         <div><strong>${translation.TargetLanguage.Name}</strong></div>
@@ -388,7 +372,7 @@ class TranslatorApp {
             this.setDropdownValue(this.sourceLanguage, translation.SourceLanguage.Code);
             this.setDropdownValue(this.targetLanguage, translation.TargetLanguage.Code);
             this.sourceText.value = translation.SourceText;
-            this.setDropdownValue(this.apiProvider, translation.Provider.ApiRoute);
+            this.setDropdownValue(this.deploymentName, this.getHistoryDeployment(translation).Name);
             this.translatedText.textContent = translation.TranslatedText;
             
             this.charCount.textContent = translation.SourceText.length;
@@ -396,6 +380,17 @@ class TranslatorApp {
             this.copyBtn.disabled = false;
             this.hideError();
         }
+    }
+
+    getHistoryDeployment(translation) {
+        if (translation.Deployment) {
+            return translation.Deployment;
+        }
+
+        return {
+            Name: null,
+            DisplayName: 'Microsoft Foundry'
+        };
     }
 
     deleteTranslation(id) {
