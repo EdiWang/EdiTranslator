@@ -1,0 +1,14 @@
+services:
+  edi-translator:
+    image: ediwang/editranslator:latest
+    container_name: edi-translator
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Production"
+    ports:
+      - "8001:8080"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
