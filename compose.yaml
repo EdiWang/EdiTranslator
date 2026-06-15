@@ -4,6 +4,8 @@ services:
     container_name: edi-translator
     environment:
       ASPNETCORE_ENVIRONMENT: "Production"
+      MicrosoftFoundry_Endpoint: ""
+      MicrosoftFoundry_Key: ""
     ports:
       - "8001:8080"
     restart: unless-stopped
