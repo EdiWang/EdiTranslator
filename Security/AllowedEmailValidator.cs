@@ -18,6 +18,7 @@ public sealed class AllowedEmailValidator(IOptions<AppAuthenticationOptions> opt
         }
 
         return options.Value.AllowedEmails?.Any(allowedEmail =>
+            !string.IsNullOrWhiteSpace(allowedEmail) &&
             string.Equals(allowedEmail.Trim(), email.Trim(), StringComparison.OrdinalIgnoreCase)) == true;
     }
 }
