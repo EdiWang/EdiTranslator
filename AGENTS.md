@@ -9,7 +9,7 @@ Edi's Translator is a .NET 10 ASP.NET Core web app for text translation. It serv
 - Keep server code under namespaces rooted at `Edi.Translator`.
 - The UI is Razor Pages plus plain JavaScript and Fluent UI Web Components loaded from CDN.
 - Do not introduce a SPA framework, frontend build pipeline, or large architectural rewrite unless explicitly requested.
-- The app has no built-in authentication. Do not assume users are authenticated; deployments may put SSO or another auth layer in front of the app.
+- The app has optional built-in SSO authentication. Do not assume users are authenticated unless `Authentication:Enabled` is true; deployments may still put another auth layer in front of the app.
 
 ## Repository Map
 
@@ -18,6 +18,8 @@ Edi's Translator is a .NET 10 ASP.NET Core web app for text translation. It serv
 - `Providers/MicrosoftFoundry/FoundryClient.cs` wraps Azure OpenAI/Microsoft Foundry chat completions.
 - `Pages/Index.cshtml.cs` prepares language and Microsoft Foundry deployment lists for the Razor UI.
 - `Pages/Index.cshtml` renders the main translation page.
+- `Pages/Account/*` owns the built-in login, logout, and access-denied Razor Pages.
+- `Security/*` owns built-in authentication helpers and Microsoft account ticket validation.
 - `wwwroot/js/site.js` owns browser interaction, localStorage history, preferences, and calls `/api/translation/{deploymentName}/stream`.
 - `wwwroot/css/site.css` contains the app styling.
 - `.github/copilot-instructions.md` contains the older Copilot-oriented guidance and should stay in sync with this file when project conventions change.
@@ -46,6 +48,8 @@ Edi's Translator is a .NET 10 ASP.NET Core web app for text translation. It serv
 - Keep route URLs lowercase and compatible with the configured lowercase route options.
 - Do not store real Microsoft Foundry, OpenAI, Docker, or other service credentials in source.
 - Use placeholder values in committed configuration examples.
+- Keep built-in authentication optional and controlled by `Authentication:Enabled`.
+- Keep authentication allow-list checks based on `Authentication:AllowedEmails`; do not introduce a database for login state unless explicitly requested.
 - Avoid broad refactors while changing Foundry behavior.
 
 ## Microsoft Foundry Translation Changes

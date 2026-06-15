@@ -9,6 +9,7 @@ A simple Web UI that uses Microsoft Foundry chat completions to translate text f
 - Translate text from one language to another
 - Save translation history
 - Microsoft Foundry deployment selection
+- Optional Microsoft account SSO with an email allow-list
 
 ## How to Run
 
@@ -18,11 +19,22 @@ A simple Web UI that uses Microsoft Foundry chat completions to translate text f
 docker run -d -p 8080:8080 -e MicrosoftFoundry__Endpoint=****** -e MicrosoftFoundry__Key=********* ediwang/editranslator
 ```
 
+To enable Microsoft account SSO in Docker, pass authentication settings as environment variables:
+
+```bash
+docker run -d -p 8080:8080 \
+  -e MicrosoftFoundry__Endpoint=****** \
+  -e MicrosoftFoundry__Key=********* \
+  -e Authentication__Enabled=true \
+  -e Authentication__AllowedEmails__0=you@example.com \
+  -e Authentication__Providers__Microsoft__ClientId=****** \
+  -e Authentication__Providers__Microsoft__ClientSecret=****** \
+  ediwang/editranslator
+```
+
 ### Code Deployment
 
 See `Development` section for setup the project. Then use `Release` configuration to build and deploy to your server.
-
-> Please note there is no built in authentication, if you need your users to login, you will need to deploy an authentication provider in front of the app. For example, you can enable SSO in Azure App Service.
 
 ## Development
 
@@ -65,6 +77,39 @@ See `Development` section for setup the project. Then use `Release` configuratio
 ```
 
 4. Run the project
+
+## Authentication
+
+Authentication is disabled by default. When enabled, the whole site and all `/api/*` endpoints require sign-in. Phase one supports personal Microsoft accounts only, and access is limited to the email addresses in `Authentication:AllowedEmails`.
+
+```json
+{
+  "Authentication": {
+    "Enabled": true,
+    "AllowedEmails": [
+      "you@example.com"
+    ],
+    "Providers": {
+      "Microsoft": {
+        "Enabled": true,
+        "ClientId": "YOUR_MICROSOFT_CLIENT_ID",
+        "ClientSecret": "YOUR_MICROSOFT_CLIENT_SECRET",
+        "CallbackPath": "/signin-microsoft"
+      }
+    }
+  }
+}
+```
+
+For local development, store `ClientId` and `ClientSecret` with User Secrets or `appsettings.Development.json`. For production, prefer environment variables or a managed secret store.
+
+Microsoft app registration setup:
+
+1. Create an app registration in the Microsoft Entra admin center.
+2. Choose **Personal Microsoft accounts only** for supported account types.
+3. Add a **Web** redirect URI that matches the app host plus the callback path, for example `https://localhost:5001/signin-microsoft` locally or `https://your-domain.example/signin-microsoft` in production.
+4. Create a client secret.
+5. Copy the application client ID and client secret into configuration.
 
 ## Tech Stack
 
