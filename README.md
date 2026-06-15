@@ -25,6 +25,7 @@ To enable Microsoft account SSO in Docker, pass authentication settings as envir
 docker run -d -p 8080:8080 \
   -e MicrosoftFoundry__Endpoint=****** \
   -e MicrosoftFoundry__Key=********* \
+  -e ASPNETCORE_FORWARDEDHEADERS_ENABLED=true \
   -e Authentication__Enabled=true \
   -e Authentication__AllowedEmails__0=you@example.com \
   -e Authentication__Providers__Microsoft__ClientId=****** \
@@ -102,6 +103,8 @@ Authentication is disabled by default. When enabled, the whole site and all `/ap
 ```
 
 For local development, store `ClientId` and `ClientSecret` with User Secrets or `appsettings.Development.json`. For production, prefer environment variables or a managed secret store.
+
+When running behind a reverse proxy or HTTPS terminator, set `ASPNETCORE_FORWARDEDHEADERS_ENABLED=true` so Microsoft account login generates the external `https://.../signin-microsoft` redirect URI instead of the container's internal `http://...` URI.
 
 Microsoft app registration setup:
 

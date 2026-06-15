@@ -4,6 +4,7 @@ services:
     container_name: edi-translator
     environment:
       ASPNETCORE_ENVIRONMENT: "Production"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
       MicrosoftFoundry__Endpoint: ""
       MicrosoftFoundry__Key: ""
 
