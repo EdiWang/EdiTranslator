@@ -1,5 +1,11 @@
+@using Edi.Translator.Configuration
+@using Microsoft.Extensions.Options
+@using System.Security.Claims
+@inject IOptions<AppAuthenticationOptions> AuthenticationOptions
 @{
     var version = System.Reflection.Assembly.GetEntryAssembly()?.GetName().Version?.ToString() ?? "unknown";
+    var authenticationEnabled = AuthenticationOptions.Value.Enabled;
+    var signedInName = User.FindFirstValue(ClaimTypes.Email) ?? User.Identity?.Name;
 }
 
 <!DOCTYPE html>
@@ -20,7 +26,16 @@
     <header class="mb-4">
         <nav>
             <h1>Edi's Translator</h1>
-            <small>@version</small>
+            <div class="nav-status">
+                <small>@version</small>
+                @if (authenticationEnabled && User.Identity?.IsAuthenticated == true)
+                {
+                    <span class="signed-in-user">@signedInName</span>
+                    <form method="post" asp-page="/Account/Logout">
+                        <fluent-button type="submit" appearance="secondary">Sign out</fluent-button>
+                    </form>
+                }
+            </div>
         </nav>
         <div id="progress-container" style="display: none;">
             <fluent-progress-bar></fluent-progress-bar>

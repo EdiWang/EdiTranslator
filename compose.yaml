@@ -4,8 +4,20 @@ services:
     container_name: edi-translator
     environment:
       ASPNETCORE_ENVIRONMENT: "Production"
-      MicrosoftFoundry_Endpoint: ""
-      MicrosoftFoundry_Key: ""
+      MicrosoftFoundry__Endpoint: ""
+      MicrosoftFoundry__Key: ""
+
+      # Authentication__Enabled: "true"
+      # Authentication__LoginPath: "/account/login"
+      # Authentication__AccessDeniedPath: "/account/denied"
+
+      # Authentication__AllowedEmails__0: "user1@example.com"
+      # Authentication__AllowedEmails__1: "user2@example.com"
+
+      # Authentication__Providers__Microsoft__Enabled: "true"
+      # Authentication__Providers__Microsoft__ClientId: "${MICROSOFT_CLIENT_ID}"
+      # Authentication__Providers__Microsoft__ClientSecret: "${MICROSOFT_CLIENT_SECRET}"
+      # Authentication__Providers__Microsoft__CallbackPath: "/signin-microsoft"
     ports:
       - "8001:8080"
     restart: unless-stopped

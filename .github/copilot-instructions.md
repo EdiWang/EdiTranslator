@@ -6,7 +6,7 @@ This is a .NET 10 ASP.NET Core web app for text translation. It serves a Razor P
 
 - Keep server code under the existing namespaces rooted at `Edi.Translator`.
 - The UI is Razor Pages plus plain JavaScript and Fluent UI Web Components loaded from CDN; do not introduce a SPA framework or frontend build pipeline unless explicitly requested.
-- The app currently has no built-in authentication. Do not assume users are authenticated; deployment can place SSO or auth in front of the app.
+- The app has optional built-in SSO authentication controlled by `Authentication:Enabled`. Do not assume users are authenticated unless that setting is enabled; deployment can still place SSO or auth in front of the app.
 
 ## Architecture
 
@@ -14,6 +14,7 @@ This is a .NET 10 ASP.NET Core web app for text translation. It serves a Razor P
 - `Controllers/TranslationController.cs` owns HTTP API behavior under `/api/translation/*` and should stay thin: validate input, select deployment, call the Foundry client, map exceptions to HTTP responses, and log with structured properties.
 - `Providers/MicrosoftFoundry/FoundryClient.cs` wraps Azure OpenAI/Microsoft Foundry chat completions. Preserve the system prompt rules when adjusting AI translation behavior.
 - `Pages/Index.cshtml.cs` provides language and Microsoft Foundry deployment lists to the Razor UI. `wwwroot/js/site.js` owns browser interaction, localStorage history, preferences, and calls `/api/translation/{deploymentName}/stream`.
+- `Pages/Account/*` owns the built-in login, logout, and access-denied Razor Pages. `Security/*` owns built-in authentication helpers and Microsoft account ticket validation.
 
 ## Coding Conventions
 
@@ -23,6 +24,8 @@ This is a .NET 10 ASP.NET Core web app for text translation. It serves a Razor P
 - Keep API DTOs in `Models/` and Foundry-specific options or clients in `Providers/MicrosoftFoundry/`.
 - Keep route URLs lowercase and compatible with the configured lowercase route options.
 - Do not store real Foundry, OpenAI, or Docker credentials in source. Use environment variables, user secrets, or `appsettings.Development.json` for local values.
+- Keep built-in authentication optional and controlled by `Authentication:Enabled`.
+- Keep authentication allow-list checks based on `Authentication:AllowedEmails`; do not introduce a database for login state unless explicitly requested.
 - Avoid broad refactors while changing Foundry behavior; maintain the existing small-service boundaries.
 
 ## Microsoft Foundry Translation Changes

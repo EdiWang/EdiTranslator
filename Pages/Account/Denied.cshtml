@@ -1,0 +1,13 @@
+@page
+@model Edi.Translator.Pages.Account.DeniedModel
+@{
+    ViewData["Title"] = "Access denied";
+}
+
+<section class="auth-panel">
+    <h2>Access denied</h2>
+    <p>Sign-in failed or access was denied. If you believe your account should be allowed, please try again or contact the site administrator.</p>
+    <form method="post" asp-page="/Account/Logout">
+        <fluent-button type="submit" appearance="primary">Sign in with another account</fluent-button>
+    </form>
+</section>

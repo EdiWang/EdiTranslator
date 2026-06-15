@@ -1,0 +1,14 @@
+@page
+@model Edi.Translator.Pages.Account.LoginModel
+@{
+    ViewData["Title"] = "Sign in";
+}
+
+<section class="auth-panel">
+    <h2>Sign in</h2>
+    <p>Use an allowed personal Microsoft account to continue.</p>
+    <form method="post" asp-page="/Account/Login">
+        <input type="hidden" asp-for="ReturnUrl" />
+        <fluent-button type="submit" appearance="primary">Sign in with Microsoft</fluent-button>
+    </form>
+</section>
